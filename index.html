@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Bukvi VPN</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-main: #ffffff;
+            --text-secondary: #aaaaaa;
+            --accent: #3b82f6; /* Красивый синий */
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Экраны (Секции) */
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            padding-bottom: 80px; /* Место под таббар */
+            box-sizing: border-box;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Загрузка */
+        #screen-loading {
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Онбординг (PWA) */
+        #screen-onboarding {
+            padding: 40px 20px;
+            text-align: center;
+            justify-content: space-between;
+        }
+
+        .ob-slide img {
+            max-width: 80%;
+            height: auto;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Логин */
+        #screen-login {
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        input {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #333;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Таббар */
+        #tabbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background: rgba(45, 45, 45, 0.95);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #444;
+            z-index: 100;
+        }
+
+        .tab-item {
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 12px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tab-item.active {
+            color: var(--accent);
+        }
+
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* Контент (Карточки) */
+        .container {
+            padding: 20px;
+        }
+
+        h1 { margin-top: 0; font-size: 28px; }
+        h2 { color: var(--text-secondary); font-size: 18px; margin-bottom: 20px; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .news-date { color: var(--text-secondary); font-size: 12px; margin-bottom: 5px; }
+        .news-title { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-danger { background-color: var(--danger); margin-top: 20px;}
+
+        .copy-box {
+            background: #111;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-top: 10px;
+            border: 1px solid #333;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="screen-loading" class="screen active">
+        <div>Загрузка...</div>
+    </div>
+
+    <div id="screen-onboarding" class="screen">
+        <div class="ob-slide">
+            <img src="https://via.placeholder.com/300x500.png?text=Step+1:+Press+Share" alt="Инструкция 1">
+            <h1>Установи Bukvi VPN</h1>
+            <h2>Нажми кнопку «Поделиться» в браузере Safari</h2>
+        </div>
+        <button class="btn" onclick="showLogin()">Понятно, дальше</button>
+    </div>
+
+    <div id="screen-login" class="screen">
+        <h1>Вход</h1>
+        <h2>Введите почту, которую вы давали админу</h2>
+        <input type="email" id="email-input" placeholder="your@email.com">
+        <button class="btn" onclick="handleLogin()">Получить ссылку для входа</button>
+        <div id="login-msg" style="margin-top:15px; color: var(--text-secondary);"></div>
+    </div>
+
+    <div id="app-content" style="display:none; height:100%;">
+        
+        <div id="tab-news" class="tab-content screen active">
+            <div class="container">
+                <h1>Новости</h1>
+                <div id="news-feed">
+                    </div>
+            </div>
+        </div>
+
+        <div id="tab-profile" class="tab-content screen">
+            <div class="container">
+                <h1>Моя подписка</h1>
+                
+                <div class="card">
+                    <div class="news-title">Ссылка для авто-обновления</div>
+                    <div class="news-date">Вставь эту ссылку в Nekobox/V2Ray один раз.</div>
+                    <div id="sub-link-box" class="copy-box">Загрузка...</div>
+                    <button class="btn" style="margin-top:10px;" onclick="copySubLink()">Скопировать ссылку</button>
+                </div>
+
+                <div class="card">
+                    <div class="news-title">FAQ / Инструкции</div>
+                    <p style="color: var(--text-secondary);">Тут скоро будет ссылка на мануал.</p>
+                </div>
+
+                <button class="btn btn-danger" onclick="handleLogout()">Выйти из аккаунта</button>
+            </div>
+        </div>
+
+        <div id="tabbar">
+            <a href="#" class="tab-item active" onclick="switchTab('news')">
+                <div class="tab-icon">📰</div>
+                Новости
+            </a>
+            <a href="#" class="tab-item" onclick="switchTab('profile')">
+                <div class="tab-icon">👤</div>
+                Профиль
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // --- КОНФИГУРАЦИЯ ---
+        const SUPABASE_URL = 'https://wlwcqifqwjfovksetuwx.supabase.co'; // https://xyz.supabase.co
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indsd2NxaWZxd2pmb3Zrc2V0dXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzg2NjEsImV4cCI6MjA4OTYxNDY2MX0.UIUTnG4yviWOJFWU4Koe2M6IGyyhUts_fitX-rVTeWQ';
+        const DENO_API_URL = 'https://near-goose-70.bukovki.deno.net'; // https://xyz.deno.dev
+
+        // Инициализация Supabase
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
+        let userTgId = null;
+
+        // --- ЛОГИКА ЗАПУСКА ---
+        async function initApp() {
+            // Проверяем, авторизован ли юзер
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                currentUser = session.user;
+                await loadUserData();
+                showApp();
+            } else {
+                // Если не в PWA режиме и не авторизован — показываем онбординг
+                if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+                    showScreen('login');
+                } else {
+                    showScreen('onboarding');
+                }
+            }
+        }
+
+        // --- ЛОГИКА АВТОРИЗАЦИИ (Magic Link) ---
+        async function handleLogin() {
+            const email = document.getElementById('email-input').value;
+            const msgEl = document.getElementById('login-msg');
+            msgEl.innerText = 'Отправляем письмо...';
+
+            const { error } = await supabase.auth.signInWithOtp({
+                email: email,
+                options: {
+                    // Куда вернуть юзера после нажатия на ссылку в письме
+                    emailRedirectTo: window.location.href 
+                }
+            });
+
+            if (error) {
+                msgEl.innerText = 'Ошибка: ' + error.message;
+                msgEl.style.color = 'var(--danger)';
+            } else {
+                msgEl.innerText = 'Проверьте почту! Вам пришла ссылка для входа.';
+                msgEl.style.color = 'var(--accent)';
+            }
+        }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            window.location.reload();
+        }
+
+        // --- ЗАГРУЗКА ДАННЫХ ---
+        async function loadUserData() {
+            if (!currentUser) return;
+
+            // 1. Пытаемся найти tg_id в таблице vpn_users по email
+            const { data, error } = await supabase
+                .from('vpn_users')
+                .select('tg_id')
+                .eq('email', currentUser.email)
+                .single();
+
+            if (data) {
+                userTgId = data.tg_id;
+                // Формируем ту самую ссылку для Deno
+                const finalSubLink = `${DENO_API_URL}/?tg_id=${userTgId}`;
+                document.getElementById('sub-link-box').innerText = finalSubLink;
+            } else {
+                document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
+            }
+
+            // 2. Загружаем новости
+            const { data: news, newsError } = await supabase
+                .from('news')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (news) {
+                const feedEl = document.getElementById('news-feed');
+                feedEl.innerHTML = '';
+                news.forEach(item => {
+                    const date = new Date(item.created_at).toLocaleDateString('ru-RU');
+                    feedEl.innerHTML += `
+                        <div class="card">
+                            <div class="news-date">${date}</div>
+                            <div class="news-title">${item.title}</div>
+                            <div style="color: var(--text-secondary); white-space: pre-wrap;">${item.content}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        // --- НАВИГАЦИЯ И УТИЛИТЫ ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-'+screenId).classList.add('active');
+        }
+
+        function showLogin() { showScreen('login'); }
+
+        function showApp() {
+            showScreen('loading'); // Прячем загрузку
+            document.getElementById('screen-loading').style.display = 'none';
+            document.getElementById('app-content').style.display = 'block';
+            document.getElementById('tabbar').style.display = 'flex';
+        }
+
+        function switchTab(tabId) {
+            // Скрываем все табы
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            // Показываем нужный
+            document.getElementById('tab-'+tabId).classList.add('active');
+            
+            // Обновляем таббар
+            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function copySubLink() {
+            const link = document.getElementById('sub-link-box').innerText;
+            if (link.startsWith('http')) {
+                navigator.clipboard.writeText(link);
+                alert('Ссылка скопирована!');
+            }
+        }
+
+        // Запуск при загрузке страницы
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
