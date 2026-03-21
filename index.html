@@ -355,7 +355,7 @@
             }
         }
 
-        // --- НАВИГАЦИЯ И УТИЛИТЫ ---
+// --- НАВИГАЦИЯ И УТИЛИТЫ ---
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-'+screenId).classList.add('active');
@@ -364,18 +364,31 @@
         function showLogin() { showScreen('login'); }
 
         function showApp() {
-            showScreen('loading'); 
+            // Прячем экран загрузки и логина
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-loading').style.display = 'none';
+            
+            // Показываем контейнер самого приложения и нижнее меню
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('tabbar').style.display = 'flex';
+            
+            // Принудительно открываем вкладку с новостями
+            switchTab('news');
         }
 
         function switchTab(tabId) {
+            // 1. Скрываем контент всех вкладок
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            // 2. Показываем нужную вкладку
             document.getElementById('tab-'+tabId).classList.add('active');
             
+            // 3. Снимаем выделение со всех кнопок в нижнем меню
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            
+            // 4. Подсвечиваем активную кнопку
+            const activeBtn = document.querySelector(`.tab-item[onclick="switchTab('${tabId}')"]`);
+            if(activeBtn) activeBtn.classList.add('active');
         }
 
         function copySubLink() {
