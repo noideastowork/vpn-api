@@ -236,28 +236,27 @@
         </div>
     </div>
 
-    <script>
+   <script>
         // --- КОНФИГУРАЦИЯ ---
-        const SUPABASE_URL = 'https://wlwcqifqwjfovksetuwx.supabase.co'; // https://xyz.supabase.co
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indsd2NxaWZxd2pmb3Zrc2V0dXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzg2NjEsImV4cCI6MjA4OTYxNDY2MX0.UIUTnG4yviWOJFWU4Koe2M6IGyyhUts_fitX-rVTeWQ';
-        const DENO_API_URL = 'https://near-goose-70.bukovki.deno.net'; // https://xyz.deno.dev
+        const SUPABASE_URL = 'ВАШ_SUPABASE_URL'; // https://xyz.supabase.co
+        const SUPABASE_ANON_KEY = 'ВАШ_SUPABASE_ANON_KEY';
+        const DENO_API_URL = 'ВАША_ССЫЛКА_ИЗ_DENO'; // https://xyz.deno.dev
 
-        // Инициализация Supabase
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Инициализация Supabase (Переименовали переменную в db)
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
         let userTgId = null;
 
         // --- ЛОГИКА ЗАПУСКА ---
         async function initApp() {
             // Проверяем, авторизован ли юзер
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await db.auth.getSession();
             
             if (session) {
                 currentUser = session.user;
                 await loadUserData();
                 showApp();
             } else {
-                // Если не в PWA режиме и не авторизован — показываем онбординг
                 if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
                     showScreen('login');
                 } else {
@@ -272,10 +271,9 @@
             const msgEl = document.getElementById('login-msg');
             msgEl.innerText = 'Отправляем письмо...';
 
-            const { error } = await supabase.auth.signInWithOtp({
+            const { error } = await db.auth.signInWithOtp({
                 email: email,
                 options: {
-                    // Куда вернуть юзера после нажатия на ссылку в письме
                     emailRedirectTo: window.location.href 
                 }
             });
@@ -290,7 +288,7 @@
         }
 
         async function handleLogout() {
-            await supabase.auth.signOut();
+            await db.auth.signOut();
             window.location.reload();
         }
 
@@ -298,8 +296,8 @@
         async function loadUserData() {
             if (!currentUser) return;
 
-            // 1. Пытаемся найти tg_id в таблице vpn_users по email
-            const { data, error } = await supabase
+            // 1. Ищем tg_id
+            const { data, error } = await db
                 .from('vpn_users')
                 .select('tg_id')
                 .eq('email', currentUser.email)
@@ -307,7 +305,6 @@
 
             if (data) {
                 userTgId = data.tg_id;
-                // Формируем ту самую ссылку для Deno
                 const finalSubLink = `${DENO_API_URL}/?tg_id=${userTgId}`;
                 document.getElementById('sub-link-box').innerText = finalSubLink;
             } else {
@@ -315,7 +312,7 @@
             }
 
             // 2. Загружаем новости
-            const { data: news, newsError } = await supabase
+            const { data: news, newsError } = await db
                 .from('news')
                 .select('*')
                 .order('created_at', { ascending: false });
@@ -345,19 +342,16 @@
         function showLogin() { showScreen('login'); }
 
         function showApp() {
-            showScreen('loading'); // Прячем загрузку
+            showScreen('loading'); 
             document.getElementById('screen-loading').style.display = 'none';
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('tabbar').style.display = 'flex';
         }
 
         function switchTab(tabId) {
-            // Скрываем все табы
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            // Показываем нужный
             document.getElementById('tab-'+tabId).classList.add('active');
             
-            // Обновляем таббар
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
             event.currentTarget.classList.add('active');
         }
@@ -370,9 +364,7 @@
             }
         }
 
-        // Запуск при загрузке страницы
         window.onload = initApp;
-
     </script>
 </body>
 </html>
