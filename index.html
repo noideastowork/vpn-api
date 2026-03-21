@@ -458,6 +458,14 @@
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('tabbar').style.display = 'flex';
             switchTab('news');
+
+            // --- ДОБАВЛЯЕМ СЛУШАТЕЛЯ НОВОСТЕЙ ---
+            db.channel('news-channel')
+              .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'news' }, payload => {
+                  console.log('Прилетела новая новость!', payload.new);
+                  loadUserData(); // Просто заново скачиваем и перерисовываем ленту
+              })
+              .subscribe();
         }
 
         function switchTab(tabId) {
