@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Bukvi VPN</title>
+    <title>Bukvi</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a1a">
@@ -207,7 +207,11 @@
         <div id="tab-profile" class="tab-content screen">
             <div class="container">
                 <h1>Моя подписка</h1>
-                
+                <div class="card">
+                    <div class="news-title">Сырые ссылки-подписки</div>
+                    <div class="news-date">Нажмите на любой ключ, чтобы скопировать его.</div>
+                    <div id="raw-links-container">Загрузка ключей...</div>
+                </div>
                 <div class="card">
                     <div class="news-title">Ссылка для авто-обновления</div>
                     <div class="news-date">Вставь эту ссылку в Nekobox/V2Ray один раз.</div>
@@ -296,10 +300,10 @@
         async function loadUserData() {
             if (!currentUser) return;
 
-            // 1. Ищем tg_id
+           // 1. Ищем tg_id и сырые ссылки (links)
             const { data, error } = await db
                 .from('vpn_users')
-                .select('tg_id')
+                .select('tg_id, links') // <-- Добавили links в запрос
                 .eq('email', currentUser.email)
                 .single();
 
@@ -307,8 +311,26 @@
                 userTgId = data.tg_id;
                 const finalSubLink = `${DENO_API_URL}/?tg_id=${userTgId}`;
                 document.getElementById('sub-link-box').innerText = finalSubLink;
+
+                // --- ВЫВОД СЫРЫХ ССЫЛОК ---
+                const rawContainer = document.getElementById('raw-links-container');
+                if (data.links && data.links.length > 0) {
+                    rawContainer.innerHTML = ''; // Очищаем текст "Загрузка..."
+                    data.links.forEach((link, index) => {
+                        // Делаем каждую ссылку кликабельной для удобного копирования
+                        rawContainer.innerHTML += `
+                            <div class="copy-box" style="margin-bottom: 10px; cursor: pointer;" onclick="navigator.clipboard.writeText('${link}'); alert('Ключ скопирован!')">
+                                ${link}
+                            </div>
+                        `;
+                    });
+                } else {
+                    rawContainer.innerText = 'У вас пока нет активных ключей.';
+                }
+
             } else {
                 document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
+                document.getElementById('raw-links-container').innerText = 'Пусто';
             }
 
             // 2. Загружаем новости
