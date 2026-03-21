@@ -31,7 +31,7 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100dvh; /* Меняем vh на dvh */
+            height: 100dvh; /* Динамическая высота для iOS */
             overflow: hidden;
         }
 
@@ -61,8 +61,8 @@
             padding: 40px 20px;
             text-align: center;
             justify-content: space-between;
-            overflow-y: auto; /* Добавляем прокрутку, если экран маленький */
-            padding-bottom: 40px; /* Чтобы кнопка не прилипала к самому низу */
+            overflow-y: auto; 
+            padding-bottom: 40px; 
         }
 
         .ob-slide img {
@@ -156,6 +156,7 @@
             font-size: 16px;
             cursor: pointer;
             width: 100%;
+            transition: all 0.2s; /* Плавность для анимации копирования */
         }
 
         .btn-danger { background-color: var(--danger); margin-top: 20px;}
@@ -169,8 +170,8 @@
             word-break: break-all;
             margin-top: 10px;
             border: 1px solid #333;
+            transition: all 0.2s; /* Плавность для анимации копирования */
         }
-
     </style>
 </head>
 <body>
@@ -188,7 +189,7 @@
         <button class="btn" onclick="showLogin()">Сделал, дальше</button>
     </div>
 
-<div id="screen-login" class="screen">
+    <div id="screen-login" class="screen">
         <h1>Вход</h1>
         
         <div id="login-step-1">
@@ -212,8 +213,7 @@
         <div id="tab-news" class="tab-content screen active">
             <div class="container">
                 <h1>Новости</h1>
-                <div id="news-feed">
-                    </div>
+                <div id="news-feed"></div>
             </div>
         </div>
 
@@ -225,11 +225,12 @@
                     <div class="news-date">Нажмите на любой ключ, чтобы скопировать его.</div>
                     <div id="raw-links-container">Загрузка ключей...</div>
                 </div>
-             <div class="card" style="display: none;">
+                
+                <div class="card" style="display: none;">
                     <div class="news-title">Ссылка для авто-обновления</div>
                     <div class="news-date">Вставь эту ссылку в Nekobox/V2Ray один раз.</div>
                     <div id="sub-link-box" class="copy-box">Загрузка...</div>
-                    <button class="btn" style="margin-top:10px;" onclick="copySubLink()">Скопировать ссылку</button>
+                    <button class="btn" style="margin-top:10px;" onclick="copyToClipboard(document.getElementById('sub-link-box').innerText, this)">Скопировать ссылку</button>
                 </div>
 
                 <div class="card">
@@ -255,24 +256,22 @@
 
    <script>
         // --- КОНФИГУРАЦИЯ ---
-        const SUPABASE_URL = 'https://wlwcqifqwjfovksetuwx.supabase.co'; // https://xyz.supabase.co
+        const SUPABASE_URL = 'https://wlwcqifqwjfovksetuwx.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indsd2NxaWZxd2pmb3Zrc2V0dXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzg2NjEsImV4cCI6MjA4OTYxNDY2MX0.UIUTnG4yviWOJFWU4Koe2M6IGyyhUts_fitX-rVTeWQ';
-        const DENO_API_URL = 'https://near-goose-70.bukovki.deno.net'; // https://xyz.deno.dev
+        const DENO_API_URL = 'https://near-goose-70.bukovki.deno.net';
 
-        // Инициализация Supabase (Переименовали переменную в db)
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
         let userTgId = null;
 
         // --- ЛОГИКА ЗАПУСКА ---
         async function initApp() {
-            // Проверяем, авторизован ли юзер
             const { data: { session } } = await db.auth.getSession();
             
             if (session) {
                 currentUser = session.user;
                 showApp();
-                loadUserData();
+                loadUserData(); // Грузим данные в фоне
             } else {
                 if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
                     showScreen('login');
@@ -282,10 +281,9 @@
             }
         }
 
-        // --- ЛОГИКА АВТОРИЗАЦИИ (Новая, через код) ---
+        // --- ЛОГИКА АВТОРИЗАЦИИ ---
         let currentEmail = '';
 
-        // Шаг 1: Отправка письма с кодом
         async function handleLogin() {
             const email = document.getElementById('email-input').value.trim();
             const msgEl = document.getElementById('login-msg');
@@ -305,7 +303,6 @@
                 msgEl.innerText = 'Ошибка: ' + error.message;
                 msgEl.style.color = 'var(--danger)';
             } else {
-                // Если успешно — прячем ввод почты, показываем ввод кода
                 currentEmail = email;
                 document.getElementById('login-step-1').style.display = 'none';
                 document.getElementById('login-step-2').style.display = 'block';
@@ -314,12 +311,11 @@
             }
         }
 
-        // Шаг 2: Проверка кода
         async function handleVerify() {
             const code = document.getElementById('code-input').value.trim();
             const msgEl = document.getElementById('login-msg');
             
-            // Убрали жесткую привязку к 6 цифрам
+            // Проверка длины (от 6 до 8 цифр)
             if (!code || code.length < 6) {
                 msgEl.innerText = 'Пожалуйста, введите код полностью.';
                 msgEl.style.color = 'var(--danger)';
@@ -329,7 +325,6 @@
             msgEl.innerText = 'Проверяем код...';
             msgEl.style.color = 'var(--text-secondary)';
 
-            // Стучимся в Supabase для проверки
             const { data, error } = await db.auth.verifyOtp({
                 email: currentEmail,
                 token: code,
@@ -340,22 +335,27 @@
                 msgEl.innerText = 'Неверный или устаревший код!';
                 msgEl.style.color = 'var(--danger)';
             } else {
-                // Успех! Юзер авторизован.
                 currentUser = data.user;
                 msgEl.innerText = 'Успешно! Загружаем профиль...';
-                await loadUserData(); // Подтягиваем ключи и новости
-                showApp(); // Перекидываем внутрь приложения
+                await loadUserData();
+                showApp();
             }
         }
-       
+        
+        // ВЫХОД ИЗ АККАУНТА
+        async function handleLogout() {
+            await db.auth.signOut();
+            window.location.reload();
+        }
+
         // --- ЗАГРУЗКА ДАННЫХ ---
         async function loadUserData() {
             if (!currentUser) return;
 
-           // 1. Ищем tg_id и сырые ссылки (links)
+            // 1. Ищем tg_id и сырые ссылки
             const { data, error } = await db
                 .from('vpn_users')
-                .select('tg_id, links') // <-- Добавили links в запрос
+                .select('tg_id, links') 
                 .eq('email', currentUser.email)
                 .single();
 
@@ -364,14 +364,13 @@
                 const finalSubLink = `${DENO_API_URL}/?tg_id=${userTgId}`;
                 document.getElementById('sub-link-box').innerText = finalSubLink;
 
-                // --- ВЫВОД СЫРЫХ ССЫЛОК ---
+                // Вывод сырых ссылок с новой анимацией копирования
                 const rawContainer = document.getElementById('raw-links-container');
                 if (data.links && data.links.length > 0) {
-                    rawContainer.innerHTML = ''; // Очищаем текст "Загрузка..."
-                    data.links.forEach((link, index) => {
-                        // Делаем каждую ссылку кликабельной для удобного копирования
+                    rawContainer.innerHTML = ''; 
+                    data.links.forEach((link) => {
                         rawContainer.innerHTML += `
-                            <div class="copy-box" style="margin-bottom: 10px; cursor: pointer;" onclick="navigator.clipboard.writeText('${link}'); alert('Ключ скопирован!')">
+                            <div class="copy-box" style="margin-bottom: 10px; cursor: pointer; text-align: center;" onclick="copyToClipboard('${link}', this)">
                                 ${link}
                             </div>
                         `;
@@ -395,13 +394,16 @@
                 const feedEl = document.getElementById('news-feed');
                 feedEl.innerHTML = '';
                 news.forEach(item => {
+                    // Жесткая установка времени по Москве
                     const date = new Date(item.created_at).toLocaleString('ru-RU', { 
+                        timeZone: 'Europe/Moscow',
                         day: '2-digit', 
                         month: '2-digit', 
                         year: 'numeric', 
                         hour: '2-digit', 
                         minute: '2-digit' 
                     });
+                    
                     feedEl.innerHTML += `
                         <div class="card">
                             <div class="news-date">${date}</div>
@@ -413,7 +415,36 @@
             }
         }
 
-// --- НАВИГАЦИЯ И УТИЛИТЫ ---
+        // --- УМНОЕ КОПИРОВАНИЕ БЕЗ ALERT ---
+        async function copyToClipboard(text, element) {
+            try {
+                // Копируем в буфер
+                await navigator.clipboard.writeText(text);
+                
+                // Запоминаем старые стили
+                const originalText = element.innerText;
+                const originalBg = element.style.backgroundColor;
+                const originalColor = element.style.color;
+
+                // Перекрашиваем в зеленый
+                element.innerText = '✅ Скопировано!';
+                element.style.backgroundColor = '#10b981';
+                element.style.color = '#ffffff';
+
+                // Возвращаем обратно через 2 секунды
+                setTimeout(() => {
+                    element.innerText = originalText;
+                    element.style.backgroundColor = originalBg;
+                    element.style.color = originalColor;
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Ошибка копирования: ', err);
+                alert('Не удалось скопировать, проверьте разрешения браузера.');
+            }
+        }
+
+        // --- НАВИГАЦИЯ И УТИЛИТЫ ---
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-'+screenId).classList.add('active');
@@ -422,39 +453,20 @@
         function showLogin() { showScreen('login'); }
 
         function showApp() {
-            // Прячем экран загрузки и логина
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-loading').style.display = 'none';
-            
-            // Показываем контейнер самого приложения и нижнее меню
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('tabbar').style.display = 'flex';
-            
-            // Принудительно открываем вкладку с новостями
             switchTab('news');
         }
 
         function switchTab(tabId) {
-            // 1. Скрываем контент всех вкладок
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            
-            // 2. Показываем нужную вкладку
             document.getElementById('tab-'+tabId).classList.add('active');
             
-            // 3. Снимаем выделение со всех кнопок в нижнем меню
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-            
-            // 4. Подсвечиваем активную кнопку
             const activeBtn = document.querySelector(`.tab-item[onclick="switchTab('${tabId}')"]`);
             if(activeBtn) activeBtn.classList.add('active');
-        }
-
-        function copySubLink() {
-            const link = document.getElementById('sub-link-box').innerText;
-            if (link.startsWith('http')) {
-                navigator.clipboard.writeText(link);
-                alert('Ссылка скопирована!');
-            }
         }
 
         window.onload = initApp;
