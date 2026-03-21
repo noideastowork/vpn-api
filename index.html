@@ -198,8 +198,8 @@
         </div>
 
         <div id="login-step-2" style="display:none;">
-            <h2>Введите 6-значный код из письма</h2>
-            <input type="text" id="code-input" placeholder="123456" maxlength="6" style="text-align: center; font-size: 24px; letter-spacing: 5px;">
+            <h2>Введите 8-значный код из письма</h2>
+            <input type="text" id="code-input" placeholder="123456" maxlength="8" style="text-align: center; font-size: 24px; letter-spacing: 5px;">
             <button class="btn" onclick="handleVerify()">Проверить и войти</button>
             <button class="btn" style="background: transparent; color: var(--text-secondary); margin-top: 10px;" onclick="location.reload()">Вернуться назад</button>
         </div>
@@ -314,13 +314,14 @@
             }
         }
 
-        // Шаг 2: Проверка 6-значного кода
+        // Шаг 2: Проверка кода
         async function handleVerify() {
             const code = document.getElementById('code-input').value.trim();
             const msgEl = document.getElementById('login-msg');
             
-            if (code.length !== 6) {
-                msgEl.innerText = 'Код должен состоять из 6 цифр.';
+            // Убрали жесткую привязку к 6 цифрам
+            if (!code || code.length < 6) {
+                msgEl.innerText = 'Пожалуйста, введите код полностью.';
                 msgEl.style.color = 'var(--danger)';
                 return;
             }
