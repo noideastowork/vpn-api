@@ -31,7 +31,7 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: 100dvh; /* Меняем vh на dvh */
             overflow: hidden;
         }
 
@@ -61,6 +61,8 @@
             padding: 40px 20px;
             text-align: center;
             justify-content: space-between;
+            overflow-y: auto; /* Добавляем прокрутку, если экран маленький */
+            padding-bottom: 40px; /* Чтобы кнопка не прилипала к самому низу */
         }
 
         .ob-slide img {
@@ -186,12 +188,23 @@
         <button class="btn" onclick="showLogin()">Понятно, дальше</button>
     </div>
 
-    <div id="screen-login" class="screen">
+<div id="screen-login" class="screen">
         <h1>Вход</h1>
-        <h2>Введите почту, которую вы давали админу</h2>
-        <input type="email" id="email-input" placeholder="your@email.com">
-        <button class="btn" onclick="handleLogin()">Получить ссылку для входа</button>
-        <div id="login-msg" style="margin-top:15px; color: var(--text-secondary);"></div>
+        
+        <div id="login-step-1">
+            <h2>Введите почту, которую вы давали админу</h2>
+            <input type="email" id="email-input" placeholder="your@email.com">
+            <button class="btn" onclick="handleLogin()">Получить код</button>
+        </div>
+
+        <div id="login-step-2" style="display:none;">
+            <h2>Введите 6-значный код из письма</h2>
+            <input type="text" id="code-input" placeholder="123456" maxlength="6" style="text-align: center; font-size: 24px; letter-spacing: 5px;">
+            <button class="btn" onclick="handleVerify()">Проверить и войти</button>
+            <button class="btn" style="background: transparent; color: var(--text-secondary); margin-top: 10px;" onclick="location.reload()">Вернуться назад</button>
+        </div>
+
+        <div id="login-msg" style="margin-top:15px; color: var(--text-secondary); text-align: center;"></div>
     </div>
 
     <div id="app-content" style="display:none; height:100%;">
@@ -258,8 +271,8 @@
             
             if (session) {
                 currentUser = session.user;
-                await loadUserData();
                 showApp();
+                loadUserData();
             } else {
                 if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
                     showScreen('login');
@@ -269,33 +282,71 @@
             }
         }
 
-        // --- ЛОГИКА АВТОРИЗАЦИИ (Magic Link) ---
+        // --- ЛОГИКА АВТОРИЗАЦИИ (Новая, через код) ---
+        let currentEmail = '';
+
+        // Шаг 1: Отправка письма с кодом
         async function handleLogin() {
-            const email = document.getElementById('email-input').value;
+            const email = document.getElementById('email-input').value.trim();
             const msgEl = document.getElementById('login-msg');
-            msgEl.innerText = 'Отправляем письмо...';
+            
+            if (!email) {
+                msgEl.innerText = 'Пожалуйста, введите почту.';
+                return;
+            }
+
+            msgEl.innerText = 'Отправляем код...';
 
             const { error } = await db.auth.signInWithOtp({
-                email: email,
-                options: {
-                    emailRedirectTo: window.location.href 
-                }
+                email: email
             });
 
             if (error) {
                 msgEl.innerText = 'Ошибка: ' + error.message;
                 msgEl.style.color = 'var(--danger)';
             } else {
-                msgEl.innerText = 'Проверьте почту! Вам пришла ссылка для входа.';
+                // Если успешно — прячем ввод почты, показываем ввод кода
+                currentEmail = email;
+                document.getElementById('login-step-1').style.display = 'none';
+                document.getElementById('login-step-2').style.display = 'block';
+                msgEl.innerText = 'Письмо отправлено! Проверьте папку "Спам", если его нет.';
                 msgEl.style.color = 'var(--accent)';
             }
         }
 
-        async function handleLogout() {
-            await db.auth.signOut();
-            window.location.reload();
-        }
+        // Шаг 2: Проверка 6-значного кода
+        async function handleVerify() {
+            const code = document.getElementById('code-input').value.trim();
+            const msgEl = document.getElementById('login-msg');
+            
+            if (code.length !== 6) {
+                msgEl.innerText = 'Код должен состоять из 6 цифр.';
+                msgEl.style.color = 'var(--danger)';
+                return;
+            }
 
+            msgEl.innerText = 'Проверяем код...';
+            msgEl.style.color = 'var(--text-secondary)';
+
+            // Стучимся в Supabase для проверки
+            const { data, error } = await db.auth.verifyOtp({
+                email: currentEmail,
+                token: code,
+                type: 'email'
+            });
+
+            if (error) {
+                msgEl.innerText = 'Неверный или устаревший код!';
+                msgEl.style.color = 'var(--danger)';
+            } else {
+                // Успех! Юзер авторизован.
+                currentUser = data.user;
+                msgEl.innerText = 'Успешно! Загружаем профиль...';
+                await loadUserData(); // Подтягиваем ключи и новости
+                showApp(); // Перекидываем внутрь приложения
+            }
+        }
+       
         // --- ЗАГРУЗКА ДАННЫХ ---
         async function loadUserData() {
             if (!currentUser) return;
