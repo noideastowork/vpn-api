@@ -395,7 +395,13 @@
                 const feedEl = document.getElementById('news-feed');
                 feedEl.innerHTML = '';
                 news.forEach(item => {
-                    const date = new Date(item.created_at).toLocaleDateString('ru-RU');
+                    const date = new Date(item.created_at).toLocaleString('ru-RU', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
                     feedEl.innerHTML += `
                         <div class="card">
                             <div class="news-date">${date}</div>
