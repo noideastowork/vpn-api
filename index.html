@@ -237,6 +237,10 @@
                     <div class="news-title">FAQ / Инструкции</div>
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/blob/main/FAQ/Happ.md" style="color: #8dcaff;">Ссылка на текстовую инструкцию, как настроить Happ</a></p>
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Happ_video.mp4" style="color: #8dcaff;">Скачать видео-инструкцию, как настроить Happ</a></p>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
+                        <span style="color: var(--text-secondary); font-size: 14px;">Если вы не можете связаться со мной в Telegram, напишите сюда:</span><br>
+                        <a href="#" id="admin-email-box" style="color: var(--accent); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Загрузка...</a>
+                    </div>
                 </div>
 
                 <button class="btn btn-danger" onclick="handleLogout()">Выйти из аккаунта</button>
@@ -379,7 +383,22 @@
                 } else {
                     rawContainer.innerText = 'У вас пока нет активных ключей.';
                 }
-
+                // 3. Загружаем глобальные настройки (почту админа)
+                const { data: settingsData, error: settingsError } = await db
+                    .from('app_settings')
+                    .select('setting_value')
+                    .eq('setting_key', 'admin_email')
+                    .single();
+    
+                const emailBox = document.getElementById('admin-email-box');
+                if (settingsData && settingsData.setting_value) {
+                    emailBox.innerText = settingsData.setting_value;
+                    // Делаем так, чтобы при клике открывалось почтовое приложение
+                    emailBox.href = `mailto:${settingsData.setting_value}`; 
+                } else {
+                    emailBox.innerText = 'Почта временно недоступна';
+                    emailBox.style.color = 'var(--text-secondary)';
+                }
             } else {
                 document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
                 document.getElementById('raw-links-container').innerText = 'Пусто';
