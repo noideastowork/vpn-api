@@ -289,7 +289,7 @@
         // --- ЛОГИКА АВТОРИЗАЦИИ ---
         let currentEmail = '';
 
-        async function handleLogin() {
+       async function handleLogin() {
             const email = document.getElementById('email-input').value.trim();
             const msgEl = document.getElementById('login-msg');
             
@@ -297,6 +297,23 @@
                 msgEl.innerText = 'Пожалуйста, введите почту.';
                 return;
             }
+
+            msgEl.innerText = 'Ищем вас в базе...';
+            msgEl.style.color = 'var(--text-secondary)';
+
+            // --- НОВЫЙ БЛОК: ФЕЙСКОНТРОЛЬ (БЕЗОПАСНЫЙ) ---
+            // Вызываем нашу безопасную функцию-вахтера через RPC
+            const { data: userExists, error: checkError } = await db.rpc('check_email_exists', {
+                search_email: email
+            });
+
+            // Если функция вернула false (почты нет)
+            if (!userExists) {
+                msgEl.innerText = 'Этой почты нет в списке! Вероятно, вы давали админу другую.';
+                msgEl.style.color = 'var(--danger)';
+                return; // Останавливаем работу, письмо НЕ отправляем
+            }
+            // ---------------------------------
 
             msgEl.innerText = 'Отправляем код...';
 
