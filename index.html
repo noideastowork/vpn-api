@@ -159,7 +159,7 @@
             transition: all 0.2s; /* Плавность для анимации копирования */
         }
 
-        .btn-danger { background-color: var(--danger); margin-top: 20px;}
+        .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 20px;}
 
         .copy-box {
             background: #111;
@@ -240,8 +240,7 @@
                         <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 2. Настройка исключений (Routing). ОБЯЗАТЕЛЬНО</h3>
                         <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Routing</b> -> <b>Default profile</b>. Вставьте эти данные в раздел <b>Bypass</b>:</p>
                         
-                        <div id="bypass-list" class="copy-box" style="margin-bottom: 10px; font-size: 12px; color: #aaa; max-height: 120px; overflow-y: auto; white-space: pre-line; line-height: 1.6; text-align: left; padding-left: 15px;">
-                            no-itisV2.com
+                        <div id="bypass-list" class="copy-box" style="margin-bottom: 10px; font-size: 12px; color: #aaa; max-height: 120px; overflow-y: auto; white-space: pre-line; line-height: 1.6; text-align: left; padding-left: 15px;">no-itisV2.com
                             1018213540.rsc.cdn77.org
                             24h.tv
                             24smi.net
@@ -426,7 +425,7 @@
                         <button class="btn" style="background: #333; font-size: 14px; padding: 10px; margin-bottom: 25px;" onclick="copyToClipboard(document.getElementById('bypass-list').innerText.trim(), this)">📋 Скопировать весь список</button>
 
                         <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавление сервера</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Servers</b> -> <b>Add server</b> и нажимайте на поля ниже, чтобы скопировать и вставить нужные данные:</p>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Servers</b> -> <b>Add server</b>/<b>Create</b> и нажимайте на поля ниже, чтобы скопировать и вставить нужные данные:</p>
                         
                         <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
                             <span style="color: var(--text-secondary); font-size: 12px;">Server name</span>
@@ -445,7 +444,7 @@
                             <div class="copy-box" style="cursor: pointer; color: #10b981;" id="tt-password-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
 
                             <span style="color: var(--text-secondary); font-size: 12px;">Protocol</span>
-                            <div class="copy-box" style="margin-bottom: 15px;">Выберите QUIC. Если не работает - HTTP</div>
+                            <div class="copy-box" style="margin-bottom: 15px;">Выберите QUIC. <i>Если после подключения VPN не работает вернитесьи выберите HTTP</i>i></div>
                             
                             <span style="color: var(--text-secondary); font-size: 12px;">DNS server adresses...</span>
                             <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">8.8.8.8</div>
