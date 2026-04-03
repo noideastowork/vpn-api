@@ -225,6 +225,19 @@
                     <div class="news-date">Нажмите на любой ключ, чтобы скопировать его.</div>
                     <div id="raw-links-container">Загрузка ключей...</div>
                 </div>
+
+                <div class="card" id="tt-card" style="display: none; border: 1px solid #10b981;">
+                    <div class="news-title">Резервный VPN (TrustTunnel). Только iOS, Android, MacOS</div>
+                    <div class="news-date">Используйте это приложение, если основные не работают</div>
+                    
+                    <div style="margin-top: 15px;">
+                        <span style="color: var(--text-secondary); font-size: 12px;">Логин (Ваш юзернейм)</span>
+                        <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; text-align: center; font-size: 16px;" onclick="copyToClipboard(this.innerText.trim(), this)" id="tt-login-box"></div>
+                        
+                        <span style="color: var(--text-secondary); font-size: 12px;">Пароль</span>
+                        <div class="copy-box" style="cursor: pointer; text-align: center; font-size: 16px;" onclick="copyToClipboard(this.innerText.trim(), this)" id="tt-password-box"></div>
+                    </div>
+                </div>
                 
                 <div class="card" style="display: none;">
                     <div class="news-title">Общая ссылка для авто-обновления</div>
@@ -374,10 +387,10 @@
         async function loadUserData() {
             if (!currentUser) return;
 
-            // 1. Ищем tg_id и сырые ссылки
+            // 1. Ищем tg_id, сырые ссылки, username и пароль от TrustTunnel
             const { data, error } = await db
                 .from('vpn_users')
-                .select('tg_id, links') 
+                .select('tg_id, links, username, tt_password') // <-- Запрашиваем username и tt_password
                 .eq('email', currentUser.email)
                 .single();
 
@@ -397,6 +410,14 @@
                             </div>
                         `;
                     });
+
+                // --- ВЫВОД TRUST TUNNEL ---
+                // Проверяем: если у пользователя есть и логин, и пароль
+                if (data.username && data.tt_password) {
+                    document.getElementById('tt-card').style.display = 'block';
+                    document.getElementById('tt-login-box').innerText = data.username;
+                    document.getElementById('tt-password-box').innerText = data.tt_password;
+                }
                 } else {
                     rawContainer.innerText = 'У вас пока нет активных ключей.';
                 }
