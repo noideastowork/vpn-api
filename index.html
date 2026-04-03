@@ -533,32 +533,48 @@
                         `;
                     });
 
-                // --- ВЫВОД TRUST TUNNEL ---
-                // Проверяем: если у пользователя есть и логин, и пароль
-                if (data.username && data.tt_password) {
-                    document.getElementById('tt-card').style.display = 'block';
-                    document.getElementById('tt-login-box').innerText = data.username;
-                    document.getElementById('tt-password-box').innerText = data.tt_password;
-                }
-                } else {
-                    rawContainer.innerText = 'У вас пока нет активных ключей.';
-                }
-                // 3. Загружаем глобальные настройки (почту админа)
-                const { data: settingsData, error: settingsError } = await db
-                    .from('app_settings')
-                    .select('setting_value')
-                    .eq('setting_key', 'admin_email')
-                    .single();
-    
-                const emailBox = document.getElementById('admin-email-box');
-                if (settingsData && settingsData.setting_value) {
-                    emailBox.innerText = settingsData.setting_value;
-                    // Делаем так, чтобы при клике открывалось почтовое приложение
-                    emailBox.href = `mailto:${settingsData.setting_value}`; 
-                } else {
-                    emailBox.innerText = 'Почта временно недоступна';
-                    emailBox.style.color = 'var(--text-secondary)';
-                }
+                // 3. Загружаем глобальные настройки (почту, IP и домен TT)
+            // Используем .in() чтобы забрать сразу несколько настроек одним запросом
+            const { data: settingsData, error: settingsError } = await db
+                .from('app_settings')
+                .select('setting_key, setting_value')
+                .in('setting_key', ['admin_email', 'tt_ip', 'tt_domain']);
+
+            const emailBox = document.getElementById('admin-email-box');
+            let fetchedIp = 'Ошибка загрузки IP';
+            let fetchedDomain = 'Ошибка загрузки домена';
+
+            if (settingsData) {
+                settingsData.forEach(setting => {
+                    if (setting.setting_key === 'admin_email') {
+                        emailBox.innerText = setting.setting_value;
+                        emailBox.href = `mailto:${setting.setting_value}`; 
+                    }
+                    if (setting.setting_key === 'tt_ip') {
+                        fetchedIp = setting.setting_value;
+                    }
+                    if (setting.setting_key === 'tt_domain') {
+                        fetchedDomain = setting.setting_value;
+                    }
+                });
+            } else {
+                emailBox.innerText = 'Почта временно недоступна';
+                emailBox.style.color = 'var(--text-secondary)';
+            }
+
+            // --- ВЫВОД TRUST TUNNEL ---
+            // Проверяем: если у пользователя есть и логин, и пароль
+            if (data.username && data.tt_password) {
+                document.getElementById('tt-card').style.display = 'block';
+                
+                // Вставляем индивидуальные данные пользователя
+                document.getElementById('tt-login-box').innerText = data.username;
+                document.getElementById('tt-password-box').innerText = data.tt_password;
+                
+                // Вставляем секретные глобальные данные сервера
+                document.getElementById('tt-ip-box').innerText = fetchedIp;
+                document.getElementById('tt-domain-box').innerText = fetchedDomain;
+            }
             } else {
                 document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
                 document.getElementById('raw-links-container').innerText = 'Пусто';
