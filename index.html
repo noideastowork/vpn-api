@@ -456,6 +456,29 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card" id="naive-card" style="display: none; border: 1px solid #3b82f6;">
+                    <div class="news-title">ПОКА НЕ РАБОТАЕТ. Ещё один запасной вариант (Naive)</div>
+                    <div class="news-date">Это супер новый и мощный протокол, который маскируется под браузер Chrome. Он работает в Karing, но обычно немного медленнее привычных вариантов. Используйте, если ничего не работает.</div>
+                    
+                    <div style="margin-top: 20px;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Обновите приложение Karing</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Это обязательно, иначе протокол не заработает.</p>
+                        
+                        <h3 style="font-size: 14px; margin-bottom: 10px; margin-top: 20px;">Шаг 2. Скопируйте ссылку</h3>
+                        <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent); word-break: break-all;" id="naive-link-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+                        
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавьте в приложение</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+                            1. Откройте Karing.<br>
+                            2. Нажмите <b>Add profile</b>.<br>
+                            3. Выберите <b>Import from Clipboard</b> (скопированная ссылка подтянется сама).<br>
+                            4. В поле <i>Remark</i> введите <b>NaiveProxy v1</b> и нажмите галочку в правом верхнем углу.
+                        </p>
+
+                        <a href="#" id="naive-magic-btn" class="btn" style="background: var(--accent); text-align: center; text-decoration: none; display: block; margin-top: 20px;">⚡️ Или добавить в 1 клик</a>
+                    </div>
+                </div>
                 
                 <div class="card" style="display: none;">
                     <div class="news-title">Общая ссылка для авто-обновления</div>
@@ -659,23 +682,48 @@
                 emailBox.style.color = 'var(--text-secondary)';
             }
 
-            // --- ВЫВОД TRUST TUNNEL ---
+// --- ВЫВОД TRUST TUNNEL И NAIVE ---
             // Проверяем: если у пользователя есть и логин, и пароль
             if (data.username && data.tt_password) {
+                // Показываем обе карточки запасных вариантов
                 document.getElementById('tt-card').style.display = 'block';
+                document.getElementById('naive-card').style.display = 'block';
                 
-                // Вставляем индивидуальные данные пользователя
+                // --- ЗАПОЛНЯЕМ TRUST TUNNEL ---
                 document.getElementById('tt-login-box').innerText = data.username;
                 document.getElementById('tt-password-box').innerText = data.tt_password;
-                
-                // Вставляем секретные глобальные данные сервера
                 document.getElementById('tt-ip-box').innerText = fetchedIp;
                 document.getElementById('tt-domain-box').innerText = fetchedDomain;
+
+                // --- ЗАПОЛНЯЕМ NAIVE (ГЕНЕРАЦИЯ ССЫЛКИ) ---
+                const naiveConfig = [
+                    {
+                        "server": fetchedDomain,
+                        "server_port": 443,
+                        "tag": "Bukvi Naive",
+                        "type": "naive",
+                        "username": data.username,
+                        "password": data.tt_password,
+                        "tls": {
+                            "enabled": true
+                        }
+                    }
+                ];
+
+                // Кодируем JSON в Base64
+                const base64Content = btoa(JSON.stringify(naiveConfig));
+                
+                // Собираем ссылку ulink
+                const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
+
+                // Вставляем ссылку в текстовое поле для копирования
+                document.getElementById('naive-link-box').innerText = finalUlink;
+                
+                // Вставляем ссылку в магическую кнопку "в 1 клик"
+                document.getElementById('naive-magic-btn').href = finalUlink;
             }
-            } else {
-                document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
-                document.getElementById('raw-links-container').innerText = 'Пусто';
-            }
+            // Конец if (data.username && data.tt_password)
+            // Дальше у тебя идет else (с sub-link-box) и блок "2. Загружаем новости"
 
             // 2. Загружаем новости
             const { data: news, newsError } = await db
