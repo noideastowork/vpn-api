@@ -476,7 +476,7 @@
                             4. В поле <i>Remark</i> введите <b>NaiveProxy v1</b> и нажмите галочку в правом верхнем углу.
                         </p>
 
-                        <a href="#" id="naive-magic-btn" class="btn" style="background: var(--accent); text-align: center; text-decoration: none; display: block; margin-top: 20px;">⚡️ Или добавить в 1 клик</a>
+                        <a href="#" id="naive-magic-btn" class="btn" style="background: var(--accent); text-align: center; text-decoration: none; display: none; margin-top: 20px;">⚡️ Или добавить в 1 клик</a>
                     </div>
                 </div>
                 
@@ -692,7 +692,7 @@
             if (data.username && data.tt_password) {
                 // Показываем обе карточки запасных вариантов
                 document.getElementById('tt-card').style.display = 'block';
-                document.getElementById('naive-card').style.display = 'block';
+               // document.getElementById('naive-card').style.display = 'block'; <--- ВРЕМЕННО ВЫКЛЮЧАЕМ (пока я не настроил сервак)
                 
                 // --- ЗАПОЛНЯЕМ TRUST TUNNEL ---
                 document.getElementById('tt-login-box').innerText = data.username;
