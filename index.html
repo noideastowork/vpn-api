@@ -726,12 +726,16 @@
                 
                 // Вставляем ссылку в магическую кнопку "в 1 клик"
                 document.getElementById('naive-magic-btn').href = finalUlink;
-            }
-            // Конец if (data.username && data.tt_password)
-            // Дальше у тебя идет else (с sub-link-box) и блок "2. Загружаем новости"
+            } // Конец if (data.username && data.tt_password)
+            
+        } else {
+            // Этот блок сработает, если пользователя вообще нет в базе vpn_users
+            document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
+            document.getElementById('raw-links-container').innerText = 'Пусто';
+        }
 
-            // 2. Загружаем новости
-            const { data: news, newsError } = await db
+        // 2. Загружаем новости
+        const { data: news, newsError } = await db
                 .from('news')
                 .select('*')
                 .order('created_at', { ascending: false });
