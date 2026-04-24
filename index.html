@@ -658,11 +658,12 @@
             const { data: settingsData, error: settingsError } = await db
                 .from('app_settings')
                 .select('setting_key, setting_value')
-                .in('setting_key', ['admin_email', 'tt_ip', 'tt_domain']);
+                .in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']);
 
             const emailBox = document.getElementById('admin-email-box');
             let fetchedIp = 'Ошибка загрузки IP';
             let fetchedDomain = 'Ошибка загрузки домена';
+            let fetchedNaiveDomain = 'Ошибка загрузки Naive домена'; // Добавляем эту строку
 
             if (settingsData) {
                 settingsData.forEach(setting => {
@@ -673,8 +674,12 @@
                     if (setting.setting_key === 'tt_ip') {
                         fetchedIp = setting.setting_value;
                     }
-                    if (setting.setting_key === 'tt_domain') {
+                   if (setting.setting_key === 'tt_domain') {
                         fetchedDomain = setting.setting_value;
+                    }
+                    // Добавьте этот блок:
+                    if (setting.setting_key === 'naive_domain') {
+                        fetchedNaiveDomain = setting.setting_value;
                     }
                 });
             } else {
@@ -698,7 +703,7 @@
                 // --- ЗАПОЛНЯЕМ NAIVE (ГЕНЕРАЦИЯ ССЫЛКИ) ---
                 const naiveConfig = [
                     {
-                        "server": fetchedDomain,
+                        "server": fetchedNaiveDomain,
                         "server_port": 443,
                         "tag": "Bukvi Naive",
                         "type": "naive",
