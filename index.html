@@ -458,7 +458,7 @@
                 </div>
            
 
-                <div class="card" id="naive-card" style="display: block; border: 1px solid #b9103f;">
+                <div class="card" id="naive-card" style="display: none; border: 1px solid #b9103f;">
                     <div class="news-title">Еще один резервный VPN (Naive). <span style="color: #b9103f;">Beta<span></div>
                     <div class="news-date">Это супер новый и мощный протокол, который маскируется под браузер Chrome. Он работает в Karing, но обычно немного медленнее привычных вариантов. И менее стабильно. Используйте, если ничего не работает.</div>
                     
@@ -705,7 +705,7 @@
             if (data.username && data.tt_password) {
                 // Показываем обе карточки запасных вариантов
                 document.getElementById('tt-card').style.display = 'block';
-               // document.getElementById('naive-card').style.display = 'block'; <--- ВРЕМЕННО ВЫКЛЮЧАЕМ (пока я не настроил сервак)
+               document.getElementById('naive-card').style.display = 'block'; // UPD Включил <--- ВРЕМЕННО ВЫКЛЮЧАЕМ (пока я не настроил сервак)
                 
                 // --- ЗАПОЛНЯЕМ TRUST TUNNEL ---
                 document.getElementById('tt-login-box').innerText = data.username;
