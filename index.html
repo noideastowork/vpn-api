@@ -751,11 +751,19 @@
             document.getElementById('raw-links-container').innerText = 'Пусто';
         }
 
-        // 2. Загружаем новости
-        const { data: news, newsError } = await db
+            // 2. Загружаем новости
+            const { data: news, error: newsError } = await db
                 .from('news')
                 .select('*')
                 .order('created_at', { ascending: false });
+
+            const feedEl = document.getElementById('news-feed'); // Находим контейнер
+
+            // ЕСЛИ ЕСТЬ ОШИБКА — ПИШЕМ ЕЁ КРАСНЫМ ПРЯМО НА ЭКРАН:
+            if (newsError) {
+                feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки новостей: ${newsError.message}</div>`;
+                return;
+            }
 
             if (news) {
                 const feedEl = document.getElementById('news-feed');
@@ -840,12 +848,12 @@
             switchTab('news');
 
             // --- ДОБАВЛЯЕМ СЛУШАТЕЛЯ НОВОСТЕЙ ---
-            db.channel('news-channel')
-              .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'news' }, payload => {
-                  console.log('Прилетела новая новость!', payload.new);
-                  loadUserData(); // Просто заново скачиваем и перерисовываем ленту
-              })
-              .subscribe();
+            // db.channel('news-channel')
+            //   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'news' }, payload => {
+            //       console.log('Прилетела новая новость!', payload.new);
+            //       loadUserData(); // Просто заново скачиваем и перерисовываем ленту
+            //   })
+            //   .subscribe();
         }
 
         function switchTab(tabId) {
