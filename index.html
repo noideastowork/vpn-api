@@ -19,7 +19,7 @@
             --card-bg: #2d2d2d;
             --text-main: #ffffff;
             --text-secondary: #aaaaaa;
-            --accent: #3b82f6; /* Красивый синий */
+            --accent: #3b82f6; 
             --danger: #ef4444;
         }
 
@@ -31,18 +31,17 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100dvh; /* Динамическая высота для iOS */
+            height: 100dvh; 
             overflow: hidden;
         }
 
-        /* Экраны (Секции) */
         .screen {
             display: none;
             flex-direction: column;
             height: 100%;
             width: 100%;
             overflow-y: auto;
-            padding-bottom: 80px; /* Место под таббар */
+            padding-bottom: 80px; 
             box-sizing: border-box;
         }
 
@@ -50,13 +49,11 @@
             display: flex;
         }
 
-        /* Загрузка */
         #screen-loading {
             justify-content: center;
             align-items: center;
         }
 
-        /* Онбординг (PWA) */
         #screen-onboarding {
             padding: 40px 20px;
             text-align: center;
@@ -73,7 +70,6 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
-        /* Логин */
         #screen-login {
             justify-content: center;
             align-items: center;
@@ -93,7 +89,6 @@
             box-sizing: border-box;
         }
 
-        /* Таббар */
         #tabbar {
             position: fixed;
             bottom: 0;
@@ -128,7 +123,6 @@
             margin-bottom: 4px;
         }
 
-        /* Контент (Карточки) */
         .container {
             padding: 20px;
         }
@@ -156,7 +150,7 @@
             font-size: 16px;
             cursor: pointer;
             width: 100%;
-            transition: all 0.2s; /* Плавность для анимации копирования */
+            transition: all 0.2s; 
         }
 
         .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 20px;}
@@ -170,7 +164,7 @@
             word-break: break-all;
             margin-top: 10px;
             border: 1px solid #333;
-            transition: all 0.2s; /* Плавность для анимации копирования */
+            transition: all 0.2s; 
         }
     </style>
 </head>
@@ -193,7 +187,7 @@
         <h1>Вход</h1>
         
         <div id="login-step-1">
-            <h2 style="text-align: center;">Введите почту, которую вы давали админу (2)</h2>
+            <h2 style="text-align: center;">Введите почту, которую вы давали админу</h2>
             <input type="email" id="email-input" placeholder="your@email.com">
             <button class="btn" onclick="handleLogin()">Получить код</button>
         </div>
@@ -503,7 +497,7 @@
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/blob/main/FAQ/Happ.md" style="color: #8dcaff;">Ссылка на текстовую инструкцию, как настроить Happ</a></p>
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Happ_video.mp4" style="color: #8dcaff;">Скачать видео-инструкцию, как настроить Happ</a></p>
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
-                        <span style="color: var(--text-secondary); font-size: 14px;"> (3) Если вы не можете связаться со мной в Telegram, напишите на эту почту:</span><br>
+                        <span style="color: var(--text-secondary); font-size: 14px;">Если вы не можете связаться со мной в Telegram, напишите на эту почту:</span><br>
                         <a href="#" id="admin-email-box" style="color: var(--accent); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Загрузка...</a>
                     </div>
                 </div>
@@ -551,7 +545,6 @@
             }
         }
 
-        // --- ЛОГИКА АВТОРИЗАЦИИ ---
         let currentEmail = '';
 
        async function handleLogin() {
@@ -566,19 +559,15 @@
             msgEl.innerText = 'Ищем вас в базе...';
             msgEl.style.color = 'var(--text-secondary)';
 
-            // --- НОВЫЙ БЛОК: ФЕЙСКОНТРОЛЬ (БЕЗОПАСНЫЙ) ---
-            // Вызываем нашу безопасную функцию-вахтера через RPC
             const { data: userExists, error: checkError } = await db.rpc('check_email_exists', {
                 search_email: email
             });
 
-            // Если функция вернула false (почты нет)
             if (!userExists) {
                 msgEl.innerText = 'Этой почты нет в списке! Вероятно, вы давали админу другую.';
                 msgEl.style.color = 'var(--danger)';
-                return; // Останавливаем работу, письмо НЕ отправляем
+                return;
             }
-            // ---------------------------------
 
             msgEl.innerText = 'Отправляем код...';
 
@@ -602,7 +591,6 @@
             const code = document.getElementById('code-input').value.trim();
             const msgEl = document.getElementById('login-msg');
             
-            // Проверка длины (от 6 до 8 цифр)
             if (!code || code.length < 6) {
                 msgEl.innerText = 'Пожалуйста, введите код полностью.';
                 msgEl.style.color = 'var(--danger)';
@@ -629,25 +617,74 @@
             }
         }
         
-        // ВЫХОД ИЗ АККАУНТА
         async function handleLogout() {
             await db.auth.signOut();
             window.location.reload();
         }
 
-        // --- ЗАГРУЗКА ДАННЫХ (НОВАЯ, ПАРАЛЛЕЛЬНАЯ И БЫСТРАЯ) ---
+        // --- ЗАГРУЗКА ДАННЫХ (НОВАЯ, ПУЛЕНЕПРОБИВАЕМАЯ) ---
         async function loadUserData() {
             if (!currentUser) return;
 
             try {
-                // Запускаем ВСЕ ТРИ запроса одновременно!
+                // Запускаем ВСЕ ТРИ запроса одновременно
                 const [userRes, settingsRes, newsRes] = await Promise.all([
                     db.from('vpn_users').select('tg_id, links, username, tt_password').eq('email', currentUser.email).single(),
                     db.from('app_settings').select('setting_key, setting_value').in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']),
                     db.from('news').select('*').order('created_at', { ascending: false })
                 ]);
 
-                // --- 1. ОБРАБАТЫВАЕМ ПОЛЬЗОВАТЕЛЯ ---
+                // === 1. ВЫВОДИМ НОВОСТИ В ПЕРВУЮ ОЧЕРЕДЬ ===
+                try {
+                    const newsData = newsRes.data;
+                    const feedEl = document.getElementById('news-feed');
+                    
+                    if (newsRes.error) {
+                        feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки: ${newsRes.error.message}</div>`;
+                    } else if (newsData) {
+                        if (newsData.length === 0) {
+                            feedEl.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 20px;">Новостей пока нет</div>`;
+                        } else {
+                            feedEl.innerHTML = '';
+                            newsData.forEach(item => {
+                                const date = new Date(item.created_at).toLocaleString('ru-RU', { 
+                                    timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                                });
+                                feedEl.innerHTML += `
+                                    <div class="card">
+                                        <div class="news-date">${date}</div>
+                                        <div class="news-title">${item.title}</div>
+                                        <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
+                                    </div>
+                                `;
+                            });
+                        }
+                    }
+                } catch (newsErr) {
+                    console.error("Сбой рендера новостей:", newsErr);
+                }
+
+                // === 2. ОБРАБАТЫВАЕМ НАСТРОЙКИ ===
+                let fetchedIp = 'Ошибка загрузки IP';
+                let fetchedDomain = 'Ошибка загрузки домена';
+                let fetchedNaiveDomain = 'Ошибка загрузки Naive домена';
+                const emailBox = document.getElementById('admin-email-box');
+
+                if (settingsRes.data) {
+                    settingsRes.data.forEach(setting => {
+                        if (setting.setting_key === 'admin_email') {
+                            emailBox.innerText = setting.setting_value;
+                            emailBox.href = `mailto:${setting.setting_value}`; 
+                        }
+                        if (setting.setting_key === 'tt_ip') fetchedIp = setting.setting_value;
+                        if (setting.setting_key === 'tt_domain') fetchedDomain = setting.setting_value;
+                        if (setting.setting_key === 'naive_domain') fetchedNaiveDomain = setting.setting_value;
+                    });
+                } else {
+                    emailBox.innerText = 'Почта временно недоступна';
+                }
+
+                // === 3. ОБРАБАТЫВАЕМ ПРОФИЛЬ ===
                 const userData = userRes.data;
                 if (userData) {
                     userTgId = userData.tg_id;
@@ -664,138 +701,73 @@
                             `;
                         });
                     }
+
+                    if (userData.username && userData.tt_password) {
+                        document.getElementById('tt-card').style.display = 'block';
+                        document.getElementById('naive-card').style.display = 'block';
+                        
+                        document.getElementById('tt-login-box').innerText = userData.username;
+                        document.getElementById('tt-password-box').innerText = userData.tt_password;
+                        document.getElementById('tt-ip-box').innerText = fetchedIp;
+                        document.getElementById('tt-domain-box').innerText = fetchedDomain;
+
+                        const naiveConfig = [{
+                            "server": fetchedNaiveDomain,
+                            "server_port": 443,
+                            "tag": "Bukvi Naive",
+                            "type": "naive",
+                            "username": userData.username,
+                            "password": userData.tt_password,
+                            "udp_over_tcp": { "enabled": true },
+                            "quic": false,
+                            "tls": { "enabled": true }
+                        }];
+
+                        // ИСПРАВЛЕНО: Безопасное кодирование (защита от кириллицы)
+                        const base64Content = btoa(unescape(encodeURIComponent(JSON.stringify(naiveConfig))));
+                        const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
+                        
+                        document.getElementById('naive-link-box').innerText = finalUlink;
+                    }
                 } else {
                     document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
                     document.getElementById('raw-links-container').innerText = 'Пусто';
                 }
 
-                // --- 2. ОБРАБАТЫВАЕМ НАСТРОЙКИ (ДОМЕНЫ) ---
-                const settingsData = settingsRes.data;
-                const emailBox = document.getElementById('admin-email-box');
-                let fetchedIp = 'Ошибка загрузки IP';
-                let fetchedDomain = 'Ошибка загрузки домена';
-                let fetchedNaiveDomain = 'Ошибка загрузки Naive домена';
-
-                if (settingsData) {
-                    settingsData.forEach(setting => {
-                        if (setting.setting_key === 'admin_email') {
-                            emailBox.innerText = setting.setting_value;
-                            emailBox.href = `mailto:${setting.setting_value}`; 
-                        }
-                        if (setting.setting_key === 'tt_ip') fetchedIp = setting.setting_value;
-                        if (setting.setting_key === 'tt_domain') fetchedDomain = setting.setting_value;
-                        if (setting.setting_key === 'naive_domain') fetchedNaiveDomain = setting.setting_value;
-                    });
-                } else {
-                    emailBox.innerText = 'Почта временно недоступна';
-                }
-
-                // --- 3. ВЫВОД КАРТОЧЕК TT И NAIVE ---
-                if (userData && userData.username && userData.tt_password) {
-                    document.getElementById('tt-card').style.display = 'block';
-                    document.getElementById('naive-card').style.display = 'block';
-                    
-                    document.getElementById('tt-login-box').innerText = userData.username;
-                    document.getElementById('tt-password-box').innerText = userData.tt_password;
-                    document.getElementById('tt-ip-box').innerText = fetchedIp;
-                    document.getElementById('tt-domain-box').innerText = fetchedDomain;
-
-                    const naiveConfig = [{
-                        "server": fetchedNaiveDomain,
-                        "server_port": 443,
-                        "tag": "Bukvi Naive",
-                        "type": "naive",
-                        "username": userData.username,
-                        "password": userData.tt_password,
-                        "udp_over_tcp": { "enabled": true },
-                        "quic": false,
-                        "tls": { "enabled": true }
-                    }];
-
-                    const base64Content = btoa(JSON.stringify(naiveConfig));
-                    const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
-                    document.getElementById('naive-link-box').innerText = finalUlink;
-                    document.getElementById('naive-magic-btn').href = finalUlink;
-                    document.getElementById('naive-magic-btn').style.display = 'block';
-                }
-
-                // --- 4. ОБРАБАТЫВАЕМ НОВОСТИ ---
-                const newsData = newsRes.data;
-                const feedEl = document.getElementById('news-feed');
-                
-                if (newsRes.error) {
-                    // Если Supabase или прокси вернули ошибку — выводим её красным
-                    feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка прокси/базы: ${newsRes.error.message}</div>`;
-                } else if (newsData) {
-                    if (newsData.length === 0) {
-                        // Если ошибки нет, но список пустой — значит база отдала 0 новостей
-                        feedEl.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 20px;">Новостей пока нет (или доступ закрыт настройками RLS в Supabase)</div>`;
-                    } else {
-                        // Если всё ок — рисуем новости
-                        feedEl.innerHTML = '';
-                        newsData.forEach(item => {
-                            const date = new Date(item.created_at).toLocaleString('ru-RU', { 
-                                timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
-                            });
-                            feedEl.innerHTML += `
-                                <div class="card">
-                                    <div class="news-date">${date}</div>
-                                    <div class="news-title">${item.title}</div>
-                                    <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
-                                </div>
-                            `;
-                        });
-                    }
-                }
-
             } catch (err) {
                 console.error("Глобальная ошибка загрузки:", err);
+                document.getElementById('news-feed').innerHTML = `<div style="color: var(--danger); padding: 10px;">Критический сбой: ${err.message}</div>`;
             }
         }
 
-        // --- ЖЕСТКОЕ ФОРМАТИРОВАНИЕ СПИСКА ДОМЕНОВ ---
         function copyBypassList(btnElement) {
-            // Берем сырой текст, игнорируя то, как браузер его отрисовал
             const rawText = document.getElementById('bypass-list').textContent;
-            
-            // Разбиваем текст по любым пробелам/отступам, выкидываем мусор и склеиваем жестким переносом
             const cleanList = rawText.split(/\s+/).filter(item => item.length > 0).join('\n');
-            
-            // Отправляем в буфер обмена
             copyToClipboard(cleanList, btnElement);
         }
 
-       
-        // --- УМНОЕ КОПИРОВАНИЕ БЕЗ ALERT ---
         async function copyToClipboard(text, element) {
             try {
-                // Копируем в буфер
                 await navigator.clipboard.writeText(text);
-                
-                // Запоминаем старые стили
                 const originalText = element.innerText;
                 const originalBg = element.style.backgroundColor;
                 const originalColor = element.style.color;
 
-                // Перекрашиваем в зеленый
                 element.innerText = '✅ Скопировано!';
                 element.style.backgroundColor = '#10b981';
                 element.style.color = '#ffffff';
 
-                // Возвращаем обратно через 2 секунды
                 setTimeout(() => {
                     element.innerText = originalText;
                     element.style.backgroundColor = originalBg;
                     element.style.color = originalColor;
                 }, 2000);
-                
             } catch (err) {
                 console.error('Ошибка копирования: ', err);
                 alert('Не удалось скопировать, проверьте разрешения браузера.');
             }
         }
 
-        // --- НАВИГАЦИЯ И УТИЛИТЫ ---
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-'+screenId).classList.add('active');
@@ -809,14 +781,6 @@
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('tabbar').style.display = 'flex';
             switchTab('news');
-
-            // --- ДОБАВЛЯЕМ СЛУШАТЕЛЯ НОВОСТЕЙ ---
-            // db.channel('news-channel')
-            //    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'news' }, payload => {
-            //        console.log('Прилетела новая новость!', payload.new);
-            //        loadUserData(); // Просто заново скачиваем и перерисовываем ленту
-            //    })
-            //    .subscribe();
         }
 
         function switchTab(tabId) {
