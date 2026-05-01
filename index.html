@@ -637,160 +637,118 @@
             window.location.reload();
         }
 
-        // --- ЗАГРУЗКА ДАННЫХ ---
+        // --- ЗАГРУЗКА ДАННЫХ (НОВАЯ, ПАРАЛЛЕЛЬНАЯ И БЫСТРАЯ) ---
         async function loadUserData() {
             if (!currentUser) return;
 
-            // 1. Ищем tg_id, сырые ссылки, username и пароль от TrustTunnel
-            const { data, error } = await db
-                .from('vpn_users')
-                .select('tg_id, links, username, tt_password') // <-- Запрашиваем username и tt_password
-                .eq('email', currentUser.email)
-                .single();
+            try {
+                // Запускаем ВСЕ ТРИ запроса одновременно!
+                const [userRes, settingsRes, newsRes] = await Promise.all([
+                    db.from('vpn_users').select('tg_id, links, username, tt_password').eq('email', currentUser.email).single(),
+                    db.from('app_settings').select('setting_key, setting_value').in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']),
+                    db.from('news').select('*').order('created_at', { ascending: false })
+                ]);
 
-            if (data) {
-                userTgId = data.tg_id;
-                const finalSubLink = `${DENO_API_URL}/?tg_id=${userTgId}`;
-                document.getElementById('sub-link-box').innerText = finalSubLink;
+                // --- 1. ОБРАБАТЫВАЕМ ПОЛЬЗОВАТЕЛЯ ---
+                const userData = userRes.data;
+                if (userData) {
+                    userTgId = userData.tg_id;
+                    document.getElementById('sub-link-box').innerText = `${DENO_API_URL}/?tg_id=${userTgId}`;
 
-                // Вывод сырых ссылок с новой анимацией копирования
-                const rawContainer = document.getElementById('raw-links-container');
-                if (data.links && data.links.length > 0) {
-                    rawContainer.innerHTML = ''; 
-                    data.links.forEach((link) => {
-                        rawContainer.innerHTML += `
-                            <div class="copy-box" style="margin-bottom: 10px; cursor: pointer; text-align: center;" onclick="copyToClipboard('${link}', this)">
-                                ${link}
+                    const rawContainer = document.getElementById('raw-links-container');
+                    if (userData.links && userData.links.length > 0) {
+                        rawContainer.innerHTML = ''; 
+                        userData.links.forEach((link) => {
+                            rawContainer.innerHTML += `
+                                <div class="copy-box" style="margin-bottom: 10px; cursor: pointer; text-align: center;" onclick="copyToClipboard('${link}', this)">
+                                    ${link}
+                                </div>
+                            `;
+                        });
+                    }
+                } else {
+                    document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
+                    document.getElementById('raw-links-container').innerText = 'Пусто';
+                }
+
+                // --- 2. ОБРАБАТЫВАЕМ НАСТРОЙКИ (ДОМЕНЫ) ---
+                const settingsData = settingsRes.data;
+                const emailBox = document.getElementById('admin-email-box');
+                let fetchedIp = 'Ошибка загрузки IP';
+                let fetchedDomain = 'Ошибка загрузки домена';
+                let fetchedNaiveDomain = 'Ошибка загрузки Naive домена';
+
+                if (settingsData) {
+                    settingsData.forEach(setting => {
+                        if (setting.setting_key === 'admin_email') {
+                            emailBox.innerText = setting.setting_value;
+                            emailBox.href = `mailto:${setting.setting_value}`; 
+                        }
+                        if (setting.setting_key === 'tt_ip') fetchedIp = setting.setting_value;
+                        if (setting.setting_key === 'tt_domain') fetchedDomain = setting.setting_value;
+                        if (setting.setting_key === 'naive_domain') fetchedNaiveDomain = setting.setting_value;
+                    });
+                } else {
+                    emailBox.innerText = 'Почта временно недоступна';
+                }
+
+                // --- 3. ВЫВОД КАРТОЧЕК TT И NAIVE ---
+                if (userData && userData.username && userData.tt_password) {
+                    document.getElementById('tt-card').style.display = 'block';
+                    document.getElementById('naive-card').style.display = 'block';
+                    
+                    document.getElementById('tt-login-box').innerText = userData.username;
+                    document.getElementById('tt-password-box').innerText = userData.tt_password;
+                    document.getElementById('tt-ip-box').innerText = fetchedIp;
+                    document.getElementById('tt-domain-box').innerText = fetchedDomain;
+
+                    const naiveConfig = [{
+                        "server": fetchedNaiveDomain,
+                        "server_port": 443,
+                        "tag": "Bukvi Naive",
+                        "type": "naive",
+                        "username": userData.username,
+                        "password": userData.tt_password,
+                        "udp_over_tcp": { "enabled": true },
+                        "quic": false,
+                        "tls": { "enabled": true }
+                    }];
+
+                    const base64Content = btoa(JSON.stringify(naiveConfig));
+                    const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
+                    document.getElementById('naive-link-box').innerText = finalUlink;
+                    document.getElementById('naive-magic-btn').href = finalUlink;
+                    document.getElementById('naive-magic-btn').style.display = 'block';
+                }
+
+                // --- 4. ОБРАБАТЫВАЕМ НОВОСТИ ---
+                const newsData = newsRes.data;
+                const feedEl = document.getElementById('news-feed');
+                
+                if (newsRes.error) {
+                    feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки новостей: ${newsRes.error.message}</div>`;
+                } else if (newsData) {
+                    feedEl.innerHTML = '';
+                    newsData.forEach(item => {
+                        const date = new Date(item.created_at).toLocaleString('ru-RU', { 
+                            timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                        });
+                        feedEl.innerHTML += `
+                            <div class="card">
+                                <div class="news-date">${date}</div>
+                                <div class="news-title">${item.title}</div>
+                                <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
                             </div>
                         `;
                     });
-                    }
+                }
 
-                // 3. Загружаем глобальные настройки (почту, IP и домен TT)
-            // Используем .in() чтобы забрать сразу несколько настроек одним запросом
-            const { data: settingsData, error: settingsError } = await db
-                .from('app_settings')
-                .select('setting_key, setting_value')
-                .in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']);
-
-            const emailBox = document.getElementById('admin-email-box');
-            let fetchedIp = 'Ошибка загрузки IP';
-            let fetchedDomain = 'Ошибка загрузки домена';
-            let fetchedNaiveDomain = 'Ошибка загрузки Naive домена'; // Добавляем эту строку
-
-            if (settingsData) {
-                settingsData.forEach(setting => {
-                    if (setting.setting_key === 'admin_email') {
-                        emailBox.innerText = setting.setting_value;
-                        emailBox.href = `mailto:${setting.setting_value}`; 
-                    }
-                    if (setting.setting_key === 'tt_ip') {
-                        fetchedIp = setting.setting_value;
-                    }
-                   if (setting.setting_key === 'tt_domain') {
-                        fetchedDomain = setting.setting_value;
-                    }
-                    // Добавьте этот блок:
-                    if (setting.setting_key === 'naive_domain') {
-                        fetchedNaiveDomain = setting.setting_value;
-                    }
-                });
-            } else {
-                emailBox.innerText = 'Почта временно недоступна';
-                emailBox.style.color = 'var(--text-secondary)';
-            }
-
-// --- ВЫВОД TRUST TUNNEL И NAIVE ---
-            // Проверяем: если у пользователя есть и логин, и пароль
-            if (data.username && data.tt_password) {
-                // Показываем обе карточки запасных вариантов
-                document.getElementById('tt-card').style.display = 'block';
-               document.getElementById('naive-card').style.display = 'block'; // UPD Включил <--- ВРЕМЕННО ВЫКЛЮЧАЕМ (пока я не настроил сервак)
-                
-                // --- ЗАПОЛНЯЕМ TRUST TUNNEL ---
-                document.getElementById('tt-login-box').innerText = data.username;
-                document.getElementById('tt-password-box').innerText = data.tt_password;
-                document.getElementById('tt-ip-box').innerText = fetchedIp;
-                document.getElementById('tt-domain-box').innerText = fetchedDomain;
-
-                // --- ЗАПОЛНЯЕМ NAIVE (ГЕНЕРАЦИЯ ССЫЛКИ) ---
-                const naiveConfig = [
-                    {
-                        "server": fetchedNaiveDomain,
-                        "server_port": 443,
-                        "tag": "Bukvi naive",
-                        "type": "naive",
-                        "username": data.username,
-                        "password": data.tt_password,
-                        "udp_over_tcp": {
-                            "enabled": true
-                        },
-                        "quic": false,
-                        "tls": {
-                            "enabled": true
-                        }
-                    }
-                ];
-
-                // Кодируем JSON в Base64
-                const base64Content = btoa(JSON.stringify(naiveConfig));
-                
-                // Собираем ссылку ulink
-                const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
-
-                // Вставляем ссылку в текстовое поле для копирования
-                document.getElementById('naive-link-box').innerText = finalUlink;
-                
-                // Вставляем ссылку в магическую кнопку "в 1 клик"
-                document.getElementById('naive-magic-btn').href = finalUlink;
-            } // Конец if (data.username && data.tt_password)
-            
-        } else {
-            // Этот блок сработает, если пользователя вообще нет в базе vpn_users
-            document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
-            document.getElementById('raw-links-container').innerText = 'Пусто';
-        }
-
-            // 2. Загружаем новости
-            const { data: news, error: newsError } = await db
-                .from('news')
-                .select('*')
-                .order('created_at', { ascending: false });
-
-            const feedEl = document.getElementById('news-feed'); // Находим контейнер
-
-            // ЕСЛИ ЕСТЬ ОШИБКА — ПИШЕМ ЕЁ КРАСНЫМ ПРЯМО НА ЭКРАН:
-            if (newsError) {
-                feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки новостей: ${newsError.message}</div>`;
-                return;
-            }
-
-            if (news) {
-                const feedEl = document.getElementById('news-feed');
-                feedEl.innerHTML = '';
-                news.forEach(item => {
-                    // Жесткая установка времени по Москве
-                    const date = new Date(item.created_at).toLocaleString('ru-RU', { 
-                        timeZone: 'Europe/Moscow',
-                        day: '2-digit', 
-                        month: '2-digit', 
-                        year: 'numeric', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                    });
-                    
-                    feedEl.innerHTML += `
-                        <div class="card">
-                            <div class="news-date">${date}</div>
-                            <div class="news-title">${item.title}</div>
-                            <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
-                        </div>
-                    `;
-                });
+            } catch (err) {
+                console.error("Глобальная ошибка загрузки:", err);
             }
         }
 
-       // --- ЖЕСТКОЕ ФОРМАТИРОВАНИЕ СПИСКА ДОМЕНОВ ---
+        // --- ЖЕСТКОЕ ФОРМАТИРОВАНИЕ СПИСКА ДОМЕНОВ ---
         function copyBypassList(btnElement) {
             // Берем сырой текст, игнорируя то, как браузер его отрисовал
             const rawText = document.getElementById('bypass-list').textContent;
@@ -849,11 +807,11 @@
 
             // --- ДОБАВЛЯЕМ СЛУШАТЕЛЯ НОВОСТЕЙ ---
             // db.channel('news-channel')
-            //   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'news' }, payload => {
-            //       console.log('Прилетела новая новость!', payload.new);
-            //       loadUserData(); // Просто заново скачиваем и перерисовываем ленту
-            //   })
-            //   .subscribe();
+            //    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'news' }, payload => {
+            //        console.log('Прилетела новая новость!', payload.new);
+            //        loadUserData(); // Просто заново скачиваем и перерисовываем ленту
+            //    })
+            //    .subscribe();
         }
 
         function switchTab(tabId) {
