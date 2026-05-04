@@ -43,29 +43,26 @@
             width: 100%;
             overflow-y: auto;
             box-sizing: border-box;
-            /* Мы убрали отсюда padding-bottom: 80px, так как таббар есть не везде */
         }
 
-        /* Добавляем новый класс: Отступ под таббар будет ТОЛЬКО во вкладках с меню */
         .tab-content {
             padding-bottom: 80px; 
         }
 
-        /* Загрузка */
         #screen-loading {
             justify-content: center;
             align-items: center;
         }
 
-        /* Онбординг (PWA) */
+        /* ИСПРАВЛЕНИЕ ВЕРСТКИ ДЛЯ МАКБУКОВ */
         #screen-onboarding {
-            padding: 20px;
+            padding: 40px 20px;
             text-align: center;
-            justify-content: center;
-            align-items: center;
+            /* Убрали justify-content, чтобы верх не обрезался при нехватке высоты */
         }
 
         .ob-slide {
+            margin: auto 0; /* Безопасное центрирование по вертикали */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -80,7 +77,7 @@
             border-radius: 20px;
             margin-bottom: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            flex-shrink: 0; /* Запрещаем картинке сплющиваться */
+            flex-shrink: 0;
         }
 
         #screen-login {
@@ -165,9 +162,12 @@
             width: 100%;
             transition: all 0.2s; 
             flex-shrink: 0; /* ВОТ МАГИЯ: Запрещаем кнопкам сплющиваться в блин! */
+            min-height: 48px; /* Гарантируем, что кнопка не будет тоньше 48px */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Не даем кнопке растянуться на весь широкий экран на Маке */
         #screen-onboarding .btn {
             max-width: 350px;
             margin-top: 15px;
@@ -199,8 +199,8 @@
             <img src="https://raw.githubusercontent.com/noideastowork/vpn-api/refs/heads/main/install.png" alt="Инструкция 1">
             <h1>Установи приложение Bukvi</h1>
             <h2>Новости и ваши ссылки-подписки хранятся тут. </h2>
+            <button class="btn" onclick="showLogin()">Сделал, дальше</button>
         </div>
-        <button class="btn" onclick="showLogin()">Сделал, дальше</button>
     </div>
 
     <div id="screen-login" class="screen">
@@ -502,6 +502,8 @@
                             5. Вернитесь в главное меню и выберите любой другой рабочий конфиг — теперь соединение должно установиться.<br>
                             6. Спустя какое-то время (от 30 секунд) вы можете снова зайти в настройки и включить профиль <b>NaiveProxy v1</b><br>
                         </p>
+
+                        <a href="#" id="naive-magic-btn" class="btn" style="background: var(--accent); text-align: center; text-decoration: none; display: none; margin-top: 20px;">⚡️ Или добавить в 1 клик</a>
                     </div>
                 </div>
                 
@@ -647,57 +649,52 @@
             if (!currentUser) return;
 
             try {
-                // Запускаем ВСЕ ТРИ запроса одновременно
-                const [userRes, settingsRes, newsRes] = await Promise.all([
-                    db.from('vpn_users').select('tg_id, links, username, tt_password').eq('email', currentUser.email).single(),
-                    db.from('app_settings').select('setting_key, setting_value').in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']),
-                    db.from('news').select('*').order('created_at', { ascending: false })
-                ]);
+                // ИСПРАВЛЕНИЕ: Запускаем независимые запросы. Если упадет один (например, профиль),
+                // остальные (например, новости) спокойно загрузятся!
+                const pUser = db.from('vpn_users').select('tg_id, links, username, tt_password').eq('email', currentUser.email).single();
+                const pSettings = db.from('app_settings').select('setting_key, setting_value').in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']);
+                const pNews = db.from('news').select('*').order('created_at', { ascending: false });
 
-                // === 1. ВЫВОДИМ НОВОСТИ В ПЕРВУЮ ОЧЕРЕДЬ ===
-                try {
+                const userRes = await pUser.catch(err => ({ error: err }));
+                const settingsRes = await pSettings.catch(err => ({ error: err }));
+                const newsRes = await pNews.catch(err => ({ error: err }));
+
+                // === 1. ВЫВОДИМ НОВОСТИ ===
+                const feedEl = document.getElementById('news-feed');
+                
+                if (newsRes.error) {
+                    feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки: ${newsRes.error.message || JSON.stringify(newsRes.error)}</div>`;
+                } else if (newsRes.data) {
                     const newsData = newsRes.data;
-                    const feedEl = document.getElementById('news-feed');
-                    
-                    if (newsRes.error) {
-                        feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки: ${newsRes.error.message}</div>`;
-                    } else if (newsData) {
-                        if (newsData.length === 0) {
-                            feedEl.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 20px;">Новостей пока нет</div>`;
-                        } else {
-                            feedEl.innerHTML = '';
-                            newsData.forEach(item => {
-                                // ИСПРАВЛЕНИЕ SAFARI DATE BUG:
-                                // Safari падает в обморок, если формат даты ему не нравится
-                                let dateStr = "Дата неизвестна";
-                                try {
-                                    // Жестко приводим дату к формату, который понимает Apple
-                                    let safeDateStr = item.created_at;
-                                    if (safeDateStr) {
-                                        safeDateStr = safeDateStr.replace(' ', 'T');
-                                    }
-                                    
-                                    dateStr = new Date(safeDateStr).toLocaleString('ru-RU', { 
-                                        timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
-                                    });
-                                } catch (dateErr) {
-                                    // Если Safari всё еще недоволен, просто выводим сырую дату из базы, чтобы не крашить приложение
-                                    dateStr = item.created_at; 
+                    if (newsData.length === 0) {
+                        feedEl.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 20px;">Новостей пока нет</div>`;
+                    } else {
+                        feedEl.innerHTML = '';
+                        newsData.forEach(item => {
+                            let dateStr = "Дата неизвестна";
+                            try {
+                                let safeDateStr = item.created_at;
+                                if (safeDateStr) {
+                                    // Safari Bug Fix: ЖЕСТКО вырезаем микросекунды, иначе iOS падает в обморок
+                                    safeDateStr = safeDateStr.replace(/\.\d+/, ''); 
+                                    safeDateStr = safeDateStr.replace(' ', 'T');
                                 }
+                                dateStr = new Date(safeDateStr).toLocaleString('ru-RU', { 
+                                    timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+                                });
+                            } catch (dateErr) {
+                                dateStr = item.created_at; 
+                            }
 
-                                feedEl.innerHTML += `
-                                    <div class="card">
-                                        <div class="news-date">${dateStr}</div>
-                                        <div class="news-title">${item.title}</div>
-                                        <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
-                                    </div>
-                                `;
-                            });
-                        }
+                            feedEl.innerHTML += `
+                                <div class="card">
+                                    <div class="news-date">${dateStr}</div>
+                                    <div class="news-title">${item.title}</div>
+                                    <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
+                                </div>
+                            `;
+                        });
                     }
-                } catch (newsErr) {
-                    // ТЕПЕРЬ ОШИБКА ТОЧНО ПОЯВИТСЯ НА ЭКРАНЕ, А НЕ В СКРЫТОЙ КОНСОЛИ
-                    document.getElementById('news-feed').innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Сбой рендера новостей (Safari): ${newsErr.message}</div>`;
                 }
 
                 // === 2. ОБРАБАТЫВАЕМ НАСТРОЙКИ ===
@@ -721,8 +718,11 @@
                 }
 
                 // === 3. ОБРАБАТЫВАЕМ ПРОФИЛЬ ===
-                const userData = userRes.data;
-                if (userData) {
+                if (userRes.error) {
+                    document.getElementById('sub-link-box').innerText = `Ошибка БД: ${userRes.error.message || JSON.stringify(userRes.error)}`;
+                    document.getElementById('raw-links-container').innerText = 'Не удалось загрузить ключи';
+                } else if (userRes.data) {
+                    const userData = userRes.data;
                     userTgId = userData.tg_id;
                     document.getElementById('sub-link-box').innerText = `${DENO_API_URL}/?tg_id=${userTgId}`;
 
@@ -759,20 +759,19 @@
                             "tls": { "enabled": true }
                         }];
 
-                        // ИСПРАВЛЕНО: Безопасное кодирование (защита от кириллицы)
                         const base64Content = btoa(unescape(encodeURIComponent(JSON.stringify(naiveConfig))));
                         const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
                         
                         document.getElementById('naive-link-box').innerText = finalUlink;
+                        
+                        // ИСПРАВЛЕНИЕ: Мы вернули строчки, которые вы случайно удалили! Теперь кнопка появится.
+                        document.getElementById('naive-magic-btn').href = finalUlink;
+                        document.getElementById('naive-magic-btn').style.display = 'block';
                     }
-                } else {
-                    document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
-                    document.getElementById('raw-links-container').innerText = 'Пусто';
                 }
-
             } catch (err) {
                 console.error("Глобальная ошибка загрузки:", err);
-                document.getElementById('news-feed').innerHTML = `<div style="color: var(--danger); padding: 10px;">Критический сбой: ${err.message}</div>`;
+                document.getElementById('news-feed').innerHTML += `<div style="color: var(--danger); padding: 10px;">Критический сбой: ${err.message}</div>`;
             }
         }
 
