@@ -1,833 +1,815 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Bukvi</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a1a1a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bukvi</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
 
-    <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --card-bg: #2d2d2d;
-            --text-main: #ffffff;
-            --text-secondary: #aaaaaa;
-            --accent: #3b82f6; 
-            --danger: #ef4444;
-        }
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100dvh; 
-            overflow: hidden;
-        }
+<style>
+:root {
+--bg-color: #1a1a1a;
+--card-bg: #2d2d2d;
+--text-main: #ffffff;
+--text-secondary: #aaaaaa;
+--accent: #3b82f6; 
+--danger: #ef4444;
+}
 
-        /* Экраны (Секции) */
-        .screen {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+background-color: var(--bg-color);
+color: var(--text-main);
+margin: 0;
+padding: 0;
+display: flex;
+flex-direction: column;
+height: 100dvh; 
+overflow: hidden;
+}
 
-        .tab-content {
-            padding-bottom: 80px; 
-        }
+.screen {
+display: none;
+flex-direction: column;
+height: 100%;
+width: 100%;
+overflow-y: auto;
+padding-bottom: 80px; 
+box-sizing: border-box;
+}
 
-        #screen-loading {
-            justify-content: center;
-            align-items: center;
-        }
+.screen.active {
+display: flex;
+}
 
-        /* ИСПРАВЛЕНИЕ ВЕРСТКИ ДЛЯ МАКБУКОВ */
-        #screen-onboarding {
-            padding: 40px 20px;
-            text-align: center;
-            /* Убрали justify-content, чтобы верх не обрезался при нехватке высоты */
-        }
+#screen-loading {
+justify-content: center;
+align-items: center;
+}
 
-        .ob-slide {
-            margin: auto 0; /* Безопасное центрирование по вертикали */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
+#screen-onboarding {
+padding: 40px 20px;
+text-align: center;
+justify-content: space-between;
+overflow-y: auto; 
+padding-bottom: 40px; 
+}
 
-        .ob-slide img {
-            width: 100%;
-            max-width: 350px;
-            max-height: 45vh;
-            object-fit: contain;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            flex-shrink: 0;
-        }
+.ob-slide img {
+max-width: 80%;
+height: auto;
+border-radius: 20px;
+margin-bottom: 20px;
+box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
 
-        #screen-login {
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+#screen-login {
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
 
-        input {
-            width: 100%;
-            max-width: 800px;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #444;
-            background: #333;
-            color: #fff;
-            font-size: 16px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
+input {
+width: 100%;
+max-width: 800px;
+padding: 15px;
+border-radius: 10px;
+border: 1px solid #444;
+background: #333;
+color: #fff;
+font-size: 16px;
+margin-bottom: 15px;
+box-sizing: border-box;
+}
 
-        #tabbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 70px;
-            background: rgba(45, 45, 45, 0.95);
-            backdrop-filter: blur(10px);
-            display: none;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid #444;
-            z-index: 100;
-        }
+#tabbar {
+position: fixed;
+bottom: 0;
+left: 0;
+width: 100%;
+height: 70px;
+background: rgba(45, 45, 45, 0.95);
+backdrop-filter: blur(10px);
+display: none;
+justify-content: space-around;
+align-items: center;
+border-top: 1px solid #444;
+z-index: 100;
+}
 
-        .tab-item {
-            color: var(--text-secondary);
-            text-align: center;
-            font-size: 12px;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+.tab-item {
+color: var(--text-secondary);
+text-align: center;
+font-size: 12px;
+text-decoration: none;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
 
-        .tab-item.active {
-            color: var(--accent);
-        }
+.tab-item.active {
+color: var(--accent);
+}
 
-        .tab-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
+.tab-icon {
+font-size: 24px;
+margin-bottom: 4px;
+}
 
-        .container {
-            padding: 20px;
-        }
+.container {
+padding: 20px;
+}
 
-        h1 { margin-top: 0; font-size: 28px; }
-        h2 { color: var(--text-secondary); font-size: 18px; margin-bottom: 20px; }
+h1 { margin-top: 0; font-size: 28px; }
+h2 { color: var(--text-secondary); font-size: 18px; margin-bottom: 20px; }
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
+.card {
+background: var(--card-bg);
+border-radius: 15px;
+padding: 20px;
+margin-bottom: 15px;
+}
 
-        .news-date { color: var(--text-secondary); font-size: 12px; margin-bottom: 5px; }
-        .news-title { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
+.news-date { color: var(--text-secondary); font-size: 12px; margin-bottom: 5px; }
+.news-title { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
 
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s; 
-            flex-shrink: 0; /* ВОТ МАГИЯ: Запрещаем кнопкам сплющиваться в блин! */
-            min-height: 48px; /* Гарантируем, что кнопка не будет тоньше 48px */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+.btn {
+background-color: var(--accent);
+color: white;
+border: none;
+padding: 12px 20px;
+border-radius: 10px;
+font-weight: bold;
+font-size: 16px;
+cursor: pointer;
+width: 100%;
+transition: all 0.2s; 
+}
 
-        #screen-onboarding .btn {
-            max-width: 350px;
-            margin-top: 15px;
-        }
+.btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 20px;}
 
-        .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 20px;}
-
-        .copy-box {
-            background: #111;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            word-break: break-all;
-            margin-top: 10px;
-            border: 1px solid #333;
-            transition: all 0.2s; 
-        }
-    </style>
+.copy-box {
+background: #111;
+padding: 10px;
+border-radius: 5px;
+font-family: monospace;
+font-size: 12px;
+word-break: break-all;
+margin-top: 10px;
+border: 1px solid #333;
+transition: all 0.2s; 
+}
+</style>
 </head>
 <body>
 
-    <div id="screen-loading" class="screen active">
-        <div>Загрузка...</div>
-    </div>
+<div id="screen-loading" class="screen active">
+<div>Загрузка...</div>
+</div>
 
-    <div id="screen-onboarding" class="screen">
-        <div class="ob-slide">
-            <img src="https://raw.githubusercontent.com/noideastowork/vpn-api/refs/heads/main/install.png" alt="Инструкция 1">
-            <h1>Установи приложение Bukvi</h1>
-            <h2>Новости и ваши ссылки-подписки хранятся тут. </h2>
-            <button class="btn" onclick="showLogin()">Сделал, дальше</button>
-        </div>
-    </div>
+<div id="screen-onboarding" class="screen">
+<div class="ob-slide">
+<img src="https://raw.githubusercontent.com/noideastowork/vpn-api/refs/heads/main/install.png" alt="Инструкция 1">
+<h1>Установи приложение Bukvi</h1>
+<h2>Новости и ваши ссылки-подписки хранятся тут. </h2>
+</div>
+<button class="btn" onclick="showLogin()">Сделал, дальше</button>
+</div>
 
-    <div id="screen-login" class="screen">
-        <h1>Вход</h1>
-        
-        <div id="login-step-1">
-            <h2 style="text-align: center;">Введите почту, которую вы давали админу</h2>
-            <input type="email" id="email-input" placeholder="your@email.com">
-            <button class="btn" onclick="handleLogin()">Получить код</button>
-        </div>
+<div id="screen-login" class="screen">
+<h1>Вход</h1>
 
-        <div id="login-step-2" style="display:none;">
-            <h2>Введите 8-значный код из письма</h2>
-            <input type="text" id="code-input" placeholder="12345678" maxlength="8" style="text-align: center; font-size: 24px; letter-spacing: 5px;">
-            <button class="btn" onclick="handleVerify()">Проверить и войти</button>
-            <button class="btn" style="background: transparent; color: var(--text-secondary); margin-top: 10px;" onclick="location.reload()">Вернуться назад</button>
-        </div>
+<div id="login-step-1">
+<h2 style="text-align: center;">Введите почту, которую вы давали админу</h2>
+<input type="email" id="email-input" placeholder="your@email.com">
+<button class="btn" onclick="handleLogin()">Получить код</button>
+</div>
 
-        <div id="login-msg" style="margin-top:15px; color: var(--text-secondary); text-align: center;"></div>
-    </div>
+<div id="login-step-2" style="display:none;">
+<h2>Введите 8-значный код из письма</h2>
+<input type="text" id="code-input" placeholder="12345678" maxlength="8" style="text-align: center; font-size: 24px; letter-spacing: 5px;">
+<button class="btn" onclick="handleVerify()">Проверить и войти</button>
+<button class="btn" style="background: transparent; color: var(--text-secondary); margin-top: 10px;" onclick="location.reload()">Вернуться назад</button>
+</div>
 
-    <div id="app-content" style="display:block; height:100%;">
-        
-        <div id="tab-news" class="tab-content screen active">
-            <div class="container">
-                <h1>Новости</h1>
-                <div id="news-feed"></div>
-            </div>
-        </div>
+<div id="login-msg" style="margin-top:15px; color: var(--text-secondary); text-align: center;"></div>
+</div>
 
-        <div id="tab-profile" class="tab-content screen">
-            <div class="container">
-                <h1>Моя подписка</h1>
-                <div class="card">
-                    <div class="news-title">Cсылки-подписки</div>
-                    <div class="news-date">Нажмите на любой ключ, чтобы скопировать его.</div>
-                    <div id="raw-links-container">Загрузка ключей...</div>
-                </div>
+<div id="app-content" style="display:block; height:100%;">
 
-                <div class="card" id="tt-card" style="display: none; border: 1px solid #10b981;">
-                    <div class="news-title">Резервный VPN (TrustTunnel). Только iOS, Android, MacOS</div>
-                    <div class="news-date">Используйте это приложение, если основные не работают.</div>
-                    
-                    <div style="margin-top: 20px;">
-                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Скачайте приложение TrustTunnel</h3>
-                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                            <a href="https://apps.apple.com/us/app/trusttunnel/id6755807890" target="_blank" class="btn" style="text-align: center; text-decoration: none; font-size: 14px; background: #333;">🍏 App Store</a>
-                            <a href="https://play.google.com/store/apps/details?id=com.adguard.trusttunnel" target="_blank" class="btn" style="text-align: center; text-decoration: none; font-size: 14px; background: #333;">🤖 Google Play</a>
-                        </div>
+<div id="tab-news" class="tab-content screen active">
+<div class="container">
+<h1>Новости</h1>
+<div id="news-feed"></div>
+</div>
+</div>
 
-                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 2. Настройка исключений (Routing). ОБЯЗАТЕЛЬНО</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Routing</b> -> <b>Default profile</b>. Вставьте эти данные в раздел <b>Bypass</b>:</p>
-                        
-                        <div id="bypass-list" class="copy-box" style="margin-bottom: 10px; font-size: 12px; color: #aaa; max-height: 120px; overflow-y: auto; white-space: pre-line; line-height: 1.6; text-align: left; padding-left: 15px;">no-itisV3.com
-                            .ru
-                            .su
-                            .xn--p1ai
-                            avito.st
-                            lmru.tech
-                            1018213540.rsc.cdn77.org
-                            24h.tv
-                            24smi.net
-                            2gis.com
-                            2gis.network
-                            5post.market
-                            adhigh.net
-                            alfabank.st
-                            aliexpress.com
-                            aviasales.com
-                            avs.io
-                            bitrix.info
-                            cdn1.ozonusercontent.com
-                            cdnvideohub.com
-                            chizhik.club
-                            ddos-guard.net
-                            diginetica.com
-                            diginetica.net
-                            dodois.com
-                            dodois.io
-                            dodopizza.com
-                            dodostatic.net
-                            donationalerts.com
-                            emias.info
-                            evrasia.rest
-                            fix-price.com
-                            flocktory.com
-                            gestalt.email
-                            group-ib.com
-                            ivi.tv
-                            kinopoisk-ru.clstorage.net
-                            kinorium.com
-                            lenta.com
-                            lenta.tech
-                            medsi.com
-                            medsi.pro
-                            memealerts.com
-                            metrika.yandex
-                            moex.com
-                            more.tv
-                            .moscow
-                            mosmetro.tech
-                            mradx.net
-                            mvk.com
-                            mycdn.me
-                            naydex.net
-                            netmonet.co
-                            ngenix.net
-                            okko.sport
-                            okko.tv
-                            okolo.app
-                            ozon.by
-                            ozon.com
-                            ozon.com.by
-                            ozon.com.kz
-                            ozon.kz
-                            ozon.tm
-                            ozonru.me
-                            ozonusercontent.com
-                            paywb.com
-                            perekrestok.com
-                            premier.one
-                            psk
-                            qrator.net
-                            radar.yandex
-                            restream-media.net
-                            rostaxi.org
-                            .ru.com
-                            .ru.net
-                            sberbank.com
-                            showip.net
-                            sistema-capital.com
-                            smartmed.pro
-                            stepik.org
-                            stormwall.pro
-                            t1.cloud
-                            tamtam.chat
-                            tatar
-                            taxsee.com
-                            tbank-online.com
-                            telega.info
-                            telega.me
-                            tips.tips
-                            tochka-tech.com
-                            tochka.com
-                            trbcdn.net
-                            uni.rest
-                            unirest.tech
-                            userapi.com
-                            variti.net
-                            vk-apps.com
-                            vk-cdn.me
-                            vk-cdn.net
-                            vk-combo.com
-                            vk-portal.net
-                            vk.cc
-                            vk.com
-                            vk.company
-                            vk.design
-                            vk.link
-                            vk.me
-                            vk.team
-                            vkcache.com
-                            vkgo.app
-                            vklive.app
-                            vkmessenger.app
-                            vkmessenger.com
-                            vkombo.com
-                            vkontakte.com
-                            vkuser.net
-                            vkuseraudio.com
-                            vkuseraudio.net
-                            vkuserlive.net
-                            vkuservideo.com
-                            vkuservideo.net
-                            webvisor.com
-                            webvisor.org
-                            x5.ai
-                            x5.com
-                            x5.digital
-                            x5.group
-                            x5.media
-                            x5.team
-                            x5.tech
-                            x5static.net
-                            ya.cc
-                            yads.tech
-                            .yandex
-                            yandex-bank.net
-                            yandex-images.clstorage.net
-                            yandex-pogoda.static-storage.net
-                            yandex.aero
-                            yandex.az
-                            yandex.by
-                            yandex.cloud
-                            yandex.co.il
-                            yandex.com
-                            yandex.com.am
-                            yandex.com.ge
-                            yandex.com.ru
-                            yandex.com.tr
-                            yandex.com.ua
-                            yandex.de
-                            yandex.ee
-                            yandex.eu
-                            yandex.fi
-                            yandex.fr
-                            yandex.jobs
-                            yandex.kg
-                            yandex.kz
-                            yandex.lt
-                            yandex.lv
-                            yandex.market
-                            yandex.md
-                            yandex.net
-                            yandex.org
-                            yandex.pl
-                            yandex.sx
-                            yandex.taxi
-                            yandex.tj
-                            yandex.tm
-                            yandex.tr
-                            yandex.travel
-                            yandex.ua
-                            yandex.uz
-                            yandex.video
-                            yandexadexchange.net
-                            yandexcloud.net
-                            yandexcom.net
-                            yandexdatafactory.com
-                            yandexmetrica.com
-                            yandexwebcache.net
-                            yandexwebcache.org
-                            yaplakal.com
-                            yastat.net
-                            yastatic.net
-                            yclients.com
-                            youla.io
-                            zenadservices.net
-                        </div>
-                        
-                        <button class="btn" style="background: #333; font-size: 14px; padding: 10px; margin-bottom: 25px;" onclick="copyBypassList(this)">📋 Скопировать весь список</button>
-                        
-                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавление сервера</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Servers</b> -> <b>Add server</b>/<b>Create</b> и нажимайте на поля ниже, чтобы скопировать и вставить нужные данные:</p>
-                        
-                        <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
-                            <span style="color: var(--text-secondary); font-size: 12px;">Server name</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">Bukvi TT v1</div>
+<div id="tab-profile" class="tab-content screen">
+<div class="container">
+<h1>Моя подписка</h1>
+<div class="card">
+<div class="news-title">Cсылки-подписки</div>
+<div class="news-date">Нажмите на любой ключ, чтобы скопировать его.</div>
+<div id="raw-links-container">Загрузка ключей...</div>
+</div>
 
-                            <span style="color: var(--text-secondary); font-size: 12px;">IP address</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-ip-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+<div class="card" id="tt-card" style="display: none; border: 1px solid #10b981;">
+<div class="news-title">Резервный VPN (TrustTunnel). Только iOS, Android, MacOS</div>
+<div class="news-date">Используйте это приложение, если основные не работают.</div>
 
-                            <span style="color: var(--text-secondary); font-size: 12px;">Domain name</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-domain-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+<div style="margin-top: 20px;">
+<h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Скачайте приложение TrustTunnel</h3>
+<div style="display: flex; gap: 10px; margin-bottom: 20px;">
+<a href="https://apps.apple.com/us/app/trusttunnel/id6755807890" target="_blank" class="btn" style="text-align: center; text-decoration: none; font-size: 14px; background: #333;">🍏 App Store</a>
+<a href="https://play.google.com/store/apps/details?id=com.adguard.trusttunnel" target="_blank" class="btn" style="text-align: center; text-decoration: none; font-size: 14px; background: #333;">🤖 Google Play</a>
+</div>
 
-                            <span style="color: var(--text-secondary); font-size: 12px;">Username</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-login-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
-                            
-                            <span style="color: var(--text-secondary); font-size: 12px;">Password</span>
-                            <div class="copy-box" style="cursor: pointer; color: #10b981;" id="tt-password-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+<h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 2. Настройка исключений (Routing). ОБЯЗАТЕЛЬНО</h3>
+<p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Routing</b> -> <b>Default profile</b>. Вставьте эти данные в раздел <b>Bypass</b>:</p>
 
-                            <span style="color: var(--text-secondary); font-size: 12px;">Protocol</span>
-                            <div class="copy-box" style="margin-bottom: 15px;">Выберите QUIC. <i>Если после подключения VPN не работает вернитесьи выберите HTTP</i></div>
-                            
-                            <span style="color: var(--text-secondary); font-size: 12px;">DNS server adresses...</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">8.8.8.8</div>
-                        </div>
-                    </div>
-                </div>
-            
+<div id="bypass-list" class="copy-box" style="margin-bottom: 10px; font-size: 12px; color: #aaa; max-height: 120px; overflow-y: auto; white-space: pre-line; line-height: 1.6; text-align: left; padding-left: 15px;">no-itisV3.com
+.ru
+.su
+.xn--p1ai
+avito.st
+lmru.tech
+1018213540.rsc.cdn77.org
+24h.tv
+24smi.net
+2gis.com
+2gis.network
+5post.market
+adhigh.net
+alfabank.st
+aliexpress.com
+aviasales.com
+avs.io
+bitrix.info
+cdn1.ozonusercontent.com
+cdnvideohub.com
+chizhik.club
+ddos-guard.net
+diginetica.com
+diginetica.net
+dodois.com
+dodois.io
+dodopizza.com
+dodostatic.net
+donationalerts.com
+emias.info
+evrasia.rest
+fix-price.com
+flocktory.com
+gestalt.email
+group-ib.com
+ivi.tv
+kinopoisk-ru.clstorage.net
+kinorium.com
+lenta.com
+lenta.tech
+medsi.com
+medsi.pro
+memealerts.com
+metrika.yandex
+moex.com
+more.tv
+.moscow
+mosmetro.tech
+mradx.net
+mvk.com
+mycdn.me
+naydex.net
+netmonet.co
+ngenix.net
+okko.sport
+okko.tv
+okolo.app
+ozon.by
+ozon.com
+ozon.com.by
+ozon.com.kz
+ozon.kz
+ozon.tm
+ozonru.me
+ozonusercontent.com
+paywb.com
+perekrestok.com
+premier.one
+psk
+qrator.net
+radar.yandex
+restream-media.net
+rostaxi.org
+.ru.com
+.ru.net
+sberbank.com
+showip.net
+sistema-capital.com
+smartmed.pro
+stepik.org
+stormwall.pro
+t1.cloud
+tamtam.chat
+tatar
+taxsee.com
+tbank-online.com
+telega.info
+telega.me
+tips.tips
+tochka-tech.com
+tochka.com
+trbcdn.net
+uni.rest
+unirest.tech
+userapi.com
+variti.net
+vk-apps.com
+vk-cdn.me
+vk-cdn.net
+vk-combo.com
+vk-portal.net
+vk.cc
+vk.com
+vk.company
+vk.design
+vk.link
+vk.me
+vk.team
+vkcache.com
+vkgo.app
+vklive.app
+vkmessenger.app
+vkmessenger.com
+vkombo.com
+vkontakte.com
+vkuser.net
+vkuseraudio.com
+vkuseraudio.net
+vkuserlive.net
+vkuservideo.com
+vkuservideo.net
+webvisor.com
+webvisor.org
+x5.ai
+x5.com
+x5.digital
+x5.group
+x5.media
+x5.team
+x5.tech
+x5static.net
+ya.cc
+yads.tech
+.yandex
+yandex-bank.net
+yandex-images.clstorage.net
+yandex-pogoda.static-storage.net
+yandex.aero
+yandex.az
+yandex.by
+yandex.cloud
+yandex.co.il
+yandex.com
+yandex.com.am
+yandex.com.ge
+yandex.com.ru
+yandex.com.tr
+yandex.com.ua
+yandex.de
+yandex.ee
+yandex.eu
+yandex.fi
+yandex.fr
+yandex.jobs
+yandex.kg
+yandex.kz
+yandex.lt
+yandex.lv
+yandex.market
+yandex.md
+yandex.net
+yandex.org
+yandex.pl
+yandex.sx
+yandex.taxi
+yandex.tj
+yandex.tm
+yandex.tr
+yandex.travel
+yandex.ua
+yandex.uz
+yandex.video
+yandexadexchange.net
+yandexcloud.net
+yandexcom.net
+yandexdatafactory.com
+yandexmetrica.com
+yandexwebcache.net
+yandexwebcache.org
+yaplakal.com
+yastat.net
+yastatic.net
+yclients.com
+youla.io
+zenadservices.net
+</div>
 
-                <div class="card" id="naive-card" style="display: none; border: 1px solid #b9103f;">
-                    <div class="news-title">Еще один резервный VPN (Naive). <span style="color: #b9103f;">Beta</span></div>
-                    <div class="news-date">Это супер новый и мощный протокол, который маскируется под браузер Chrome. Он работает в Karing, но обычно немного медленнее привычных вариантов. И менее стабильно. Используйте, если ничего не работает.</div>
-                    
-                    <div style="margin-top: 20px;">
-                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Обновите приложение Karing</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Это обязательно, иначе протокол не заработает.</p>
-                        
-                        <h3 style="font-size: 14px; margin-bottom: 10px; margin-top: 20px;">Шаг 2. Скопируйте ссылку</h3>
-                        <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent); word-break: break-all;" id="naive-link-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
-                        
-                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавьте в приложение</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
-                            1. Откройте Karing.<br>
-                            2. Нажмите <b>Add profile</b>.<br>
-                            3. Выберите <b>Import from Clipboard</b> (скопированная ссылка подтянется сама).<br>
-                            4. В поле <i>Remark</i> введите <b>NaiveProxy v1</b> и нажмите галочку в правом верхнем углу.
-                        </p>
-                        <h3 style="font-size: 14px; margin-bottom: 10px; color: #b9103f;">Важное предупреждение:</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
-                            Добавление этого протокола в случайный момент может полностью сломать Karing — пропадет возможность подключиться к любому профилю конфигурации. Пока этот баг был замечен только на macOS (разработчик уже уведомлен; надеюсь, пофиксит). Если вы столкнетесь с этим на других платформах — обязательно дайте знать.<br>
-                            <br>
-                            Но есть костыльный фикс. Если Karing перестал подключаться, выполните следующие шаги для восстановления:<br>
-                            1. Откройте Karing.<br>
-                            2. Отключите соединение, нажав на кнопку внизу экрана (как обычно выключаете VPN).<br>
-                            3. Перейдите в раздел <b>My Profiles</b>.<br>
-                            4. Пролистайте список до профиля <b>NaiveProxy v1</b> и выключите его с помощью тумблера.<br>
-                            5. Вернитесь в главное меню и выберите любой другой рабочий конфиг — теперь соединение должно установиться.<br>
-                            6. Спустя какое-то время (от 30 секунд) вы можете снова зайти в настройки и включить профиль <b>NaiveProxy v1</b><br>
-                        </p>
+<button class="btn" style="background: #333; font-size: 14px; padding: 10px; margin-bottom: 25px;" onclick="copyBypassList(this)">📋 Скопировать весь список</button>
 
-                        <a href="#" id="naive-magic-btn" class="btn" style="background: var(--accent); text-align: center; text-decoration: none; display: none; margin-top: 20px;">⚡️ Или добавить в 1 клик</a>
-                    </div>
-                </div>
-                
-                <div class="card" style="display: none;">
-                    <div class="news-title">Общая ссылка для авто-обновления</div>
-                    <div class="news-date">Вставь эту ссылку в Karing/Happ один раз.</div>
-                    <div id="sub-link-box" class="copy-box">Загрузка...</div>
-                    <button class="btn" style="margin-top:10px;" onclick="copyToClipboard(document.getElementById('sub-link-box').innerText, this)">Скопировать ссылку</button>
-                </div>
+<h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавление сервера</h3>
+<p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Servers</b> -> <b>Add server</b>/<b>Create</b> и нажимайте на поля ниже, чтобы скопировать и вставить нужные данные:</p>
 
-                <div class="card">
-                    <div class="news-title">FAQ / Инструкции</div>
-                    <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/blob/main/FAQ/Happ.md" style="color: #8dcaff;">Ссылка на текстовую инструкцию, как настроить Happ</a></p>
-                    <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Happ_video.mp4" style="color: #8dcaff;">Скачать видео-инструкцию, как настроить Happ</a></p>
-                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
-                        <span style="color: var(--text-secondary); font-size: 14px;">Если вы не можете связаться со мной в Telegram, напишите на эту почту:</span><br>
-                        <a href="#" id="admin-email-box" style="color: var(--accent); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Загрузка...</a>
-                    </div>
-                </div>
+<div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
+<span style="color: var(--text-secondary); font-size: 12px;">Server name</span>
+<div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">Bukvi TT v1</div>
 
-                <button class="btn btn-danger" onclick="handleLogout()">Выйти из аккаунта</button>
-            </div>
-        </div>
+<span style="color: var(--text-secondary); font-size: 12px;">IP address</span>
+<div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-ip-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
 
-        <div id="tabbar">
-            <a href="#" class="tab-item active" onclick="switchTab('news')">
-                <div class="tab-icon">📰</div>
-                Новости
-            </a>
-            <a href="#" class="tab-item" onclick="switchTab('profile')">
-                <div class="tab-icon">👤</div>
-                Профиль
-            </a>
-        </div>
-    </div>
+<span style="color: var(--text-secondary); font-size: 12px;">Domain name</span>
+<div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-domain-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
 
-   <script>
-        // --- КОНФИГУРАЦИЯ ---
+<span style="color: var(--text-secondary); font-size: 12px;">Username</span>
+<div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-login-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+
+<span style="color: var(--text-secondary); font-size: 12px;">Password</span>
+<div class="copy-box" style="cursor: pointer; color: #10b981;" id="tt-password-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+
+<span style="color: var(--text-secondary); font-size: 12px;">Protocol</span>
+<div class="copy-box" style="margin-bottom: 15px;">Выберите QUIC. <i>Если после подключения VPN не работает вернитесьи выберите HTTP</i></div>
+
+<span style="color: var(--text-secondary); font-size: 12px;">DNS server adresses...</span>
+<div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">8.8.8.8</div>
+</div>
+</div>
+</div>
+
+
+<div class="card" id="naive-card" style="display: none; border: 1px solid #b9103f;">
+<div class="news-title">Еще один резервный VPN (Naive). <span style="color: #b9103f;">Beta</span></div>
+<div class="news-date">Это супер новый и мощный протокол, который маскируется под браузер Chrome. Он работает в Karing, но обычно немного медленнее привычных вариантов. И менее стабильно. Используйте, если ничего не работает.</div>
+
+<div style="margin-top: 20px;">
+<h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Обновите приложение Karing</h3>
+<p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Это обязательно, иначе протокол не заработает.</p>
+
+<h3 style="font-size: 14px; margin-bottom: 10px; margin-top: 20px;">Шаг 2. Скопируйте ссылку</h3>
+<div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent); word-break: break-all;" id="naive-link-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+
+<h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавьте в приложение</h3>
+<p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+1. Откройте Karing.<br>
+2. Нажмите <b>Add profile</b>.<br>
+3. Выберите <b>Import from Clipboard</b> (скопированная ссылка подтянется сама).<br>
+4. В поле <i>Remark</i> введите <b>NaiveProxy v1</b> и нажмите галочку в правом верхнем углу.
+</p>
+<h3 style="font-size: 14px; margin-bottom: 10px; color: #b9103f;">Важное предупреждение:</h3>
+<p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">
+Добавление этого протокола в случайный момент может полностью сломать Karing — пропадет возможность подключиться к любому профилю конфигурации. Пока этот баг был замечен только на macOS (разработчик уже уведомлен; надеюсь, пофиксит). Если вы столкнетесь с этим на других платформах — обязательно дайте знать.<br>
+<br>
+Но есть костыльный фикс. Если Karing перестал подключаться, выполните следующие шаги для восстановления:<br>
+1. Откройте Karing.<br>
+2. Отключите соединение, нажав на кнопку внизу экрана (как обычно выключаете VPN).<br>
+3. Перейдите в раздел <b>My Profiles</b>.<br>
+4. Пролистайте список до профиля <b>NaiveProxy v1</b> и выключите его с помощью тумблера.<br>
+5. Вернитесь в главное меню и выберите любой другой рабочий конфиг — теперь соединение должно установиться.<br>
+6. Спустя какое-то время (от 30 секунд) вы можете снова зайти в настройки и включить профиль <b>NaiveProxy v1</b><br>
+</p>
+</div>
+</div>
+
+<div class="card" style="display: none;">
+<div class="news-title">Общая ссылка для авто-обновления</div>
+<div class="news-date">Вставь эту ссылку в Karing/Happ один раз.</div>
+<div id="sub-link-box" class="copy-box">Загрузка...</div>
+<button class="btn" style="margin-top:10px;" onclick="copyToClipboard(document.getElementById('sub-link-box').innerText, this)">Скопировать ссылку</button>
+</div>
+
+<div class="card">
+<div class="news-title">FAQ / Инструкции</div>
+<p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/blob/main/FAQ/Happ.md" style="color: #8dcaff;">Ссылка на текстовую инструкцию, как настроить Happ</a></p>
+<p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Happ_video.mp4" style="color: #8dcaff;">Скачать видео-инструкцию, как настроить Happ</a></p>
+<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
+<span style="color: var(--text-secondary); font-size: 14px;">Если вы не можете связаться со мной в Telegram, напишите на эту почту:</span><br>
+<a href="#" id="admin-email-box" style="color: var(--accent); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Загрузка...</a>
+</div>
+</div>
+
+<button class="btn btn-danger" onclick="handleLogout()">Выйти из аккаунта</button>
+</div>
+</div>
+
+<div id="tabbar">
+<a href="#" class="tab-item active" onclick="switchTab('news')">
+<div class="tab-icon">📰</div>
+Новости
+</a>
+<a href="#" class="tab-item" onclick="switchTab('profile')">
+<div class="tab-icon">👤</div>
+Профиль
+</a>
+</div>
+</div>
+
+<script>
+// --- КОНФИГУРАЦИЯ ---
+        const SUPABASE_URL = 'https://wlwcqifqwjfovksetuwx.supabase.co'; 
         const SUPABASE_URL = 'https://mycloud.servernux.com/supa'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indsd2NxaWZxd2pmb3Zrc2V0dXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzg2NjEsImV4cCI6MjA4OTYxNDY2MX0.UIUTnG4yviWOJFWU4Koe2M6IGyyhUts_fitX-rVTeWQ';
-        const DENO_API_URL = 'https://near-goose-70.bukovki.deno.net';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indsd2NxaWZxd2pmb3Zrc2V0dXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMzg2NjEsImV4cCI6MjA4OTYxNDY2MX0.UIUTnG4yviWOJFWU4Koe2M6IGyyhUts_fitX-rVTeWQ';
+const DENO_API_URL = 'https://near-goose-70.bukovki.deno.net';
 
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let currentUser = null;
-        let userTgId = null;
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+let userTgId = null;
 
-        // --- ЛОГИКА ЗАПУСКА ---
-        async function initApp() {
-            const { data: { session } } = await db.auth.getSession();
-            
-            if (session) {
-                currentUser = session.user;
-                showApp();
-                loadUserData(); // Грузим данные в фоне
-            } else {
-                if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
-                    showScreen('login');
-                } else {
-                    showScreen('onboarding');
-                }
-            }
-        }
+// --- ЛОГИКА ЗАПУСКА ---
+async function initApp() {
+const { data: { session } } = await db.auth.getSession();
 
-        let currentEmail = '';
+if (session) {
+currentUser = session.user;
+showApp();
+loadUserData(); // Грузим данные в фоне
+} else {
+if (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches) {
+showScreen('login');
+} else {
+showScreen('onboarding');
+}
+}
+}
 
-       async function handleLogin() {
-            const email = document.getElementById('email-input').value.trim();
-            const msgEl = document.getElementById('login-msg');
-            
-            if (!email) {
-                msgEl.innerText = 'Пожалуйста, введите почту.';
-                return;
-            }
+let currentEmail = '';
 
-            msgEl.innerText = 'Ищем вас в базе...';
-            msgEl.style.color = 'var(--text-secondary)';
+async function handleLogin() {
+const email = document.getElementById('email-input').value.trim();
+const msgEl = document.getElementById('login-msg');
 
-            const { data: userExists, error: checkError } = await db.rpc('check_email_exists', {
-                search_email: email
-            });
+if (!email) {
+msgEl.innerText = 'Пожалуйста, введите почту.';
+return;
+}
 
-            if (!userExists) {
-                msgEl.innerText = 'Этой почты нет в списке! Вероятно, вы давали админу другую.';
-                msgEl.style.color = 'var(--danger)';
-                return;
-            }
+msgEl.innerText = 'Ищем вас в базе...';
+msgEl.style.color = 'var(--text-secondary)';
 
-            msgEl.innerText = 'Отправляем код...';
+const { data: userExists, error: checkError } = await db.rpc('check_email_exists', {
+search_email: email
+});
 
-            const { error } = await db.auth.signInWithOtp({
-                email: email
-            });
+if (!userExists) {
+msgEl.innerText = 'Этой почты нет в списке! Вероятно, вы давали админу другую.';
+msgEl.style.color = 'var(--danger)';
+return;
+}
 
-            if (error) {
-                msgEl.innerText = 'Ошибка: ' + error.message;
-                msgEl.style.color = 'var(--danger)';
-            } else {
-                currentEmail = email;
-                document.getElementById('login-step-1').style.display = 'none';
-                document.getElementById('login-step-2').style.display = 'block';
-                msgEl.innerText = 'Письмо отправлено! Проверьте папку "Спам", если его нет.';
-                msgEl.style.color = 'var(--accent)';
-            }
-        }
+msgEl.innerText = 'Отправляем код...';
 
-        async function handleVerify() {
-            const code = document.getElementById('code-input').value.trim();
-            const msgEl = document.getElementById('login-msg');
-            
-            if (!code || code.length < 6) {
-                msgEl.innerText = 'Пожалуйста, введите код полностью.';
-                msgEl.style.color = 'var(--danger)';
-                return;
-            }
+const { error } = await db.auth.signInWithOtp({
+email: email
+});
 
-            msgEl.innerText = 'Проверяем код...';
-            msgEl.style.color = 'var(--text-secondary)';
+if (error) {
+msgEl.innerText = 'Ошибка: ' + error.message;
+msgEl.style.color = 'var(--danger)';
+} else {
+currentEmail = email;
+document.getElementById('login-step-1').style.display = 'none';
+document.getElementById('login-step-2').style.display = 'block';
+msgEl.innerText = 'Письмо отправлено! Проверьте папку "Спам", если его нет.';
+msgEl.style.color = 'var(--accent)';
+}
+}
 
-            const { data, error } = await db.auth.verifyOtp({
-                email: currentEmail,
-                token: code,
-                type: 'email'
-            });
+async function handleVerify() {
+const code = document.getElementById('code-input').value.trim();
+const msgEl = document.getElementById('login-msg');
 
-            if (error) {
-                msgEl.innerText = 'Неверный или устаревший код!';
-                msgEl.style.color = 'var(--danger)';
-            } else {
-                currentUser = data.user;
-                msgEl.innerText = 'Успешно! Загружаем профиль...';
-                await loadUserData();
-                showApp();
-            }
-        }
-        
-        async function handleLogout() {
-            await db.auth.signOut();
-            window.location.reload();
-        }
+if (!code || code.length < 6) {
+msgEl.innerText = 'Пожалуйста, введите код полностью.';
+msgEl.style.color = 'var(--danger)';
+return;
+}
 
-        // --- ЗАГРУЗКА ДАННЫХ (НОВАЯ, ПУЛЕНЕПРОБИВАЕМАЯ) ---
-        async function loadUserData() {
-            if (!currentUser) return;
+msgEl.innerText = 'Проверяем код...';
+msgEl.style.color = 'var(--text-secondary)';
 
-            try {
-                // ИСПРАВЛЕНИЕ: Запускаем независимые запросы. Если упадет один (например, профиль),
-                // остальные (например, новости) спокойно загрузятся!
-                const pUser = db.from('vpn_users').select('tg_id, links, username, tt_password').eq('email', currentUser.email).single();
-                const pSettings = db.from('app_settings').select('setting_key, setting_value').in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']);
-                const pNews = db.from('news').select('*').order('created_at', { ascending: false });
+const { data, error } = await db.auth.verifyOtp({
+email: currentEmail,
+token: code,
+type: 'email'
+});
 
-                const userRes = await pUser.catch(err => ({ error: err }));
-                const settingsRes = await pSettings.catch(err => ({ error: err }));
-                const newsRes = await pNews.catch(err => ({ error: err }));
+if (error) {
+msgEl.innerText = 'Неверный или устаревший код!';
+msgEl.style.color = 'var(--danger)';
+} else {
+currentUser = data.user;
+msgEl.innerText = 'Успешно! Загружаем профиль...';
+await loadUserData();
+showApp();
+}
+}
 
-                // === 1. ВЫВОДИМ НОВОСТИ ===
-                const feedEl = document.getElementById('news-feed');
-                
-                if (newsRes.error) {
-                    feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки: ${newsRes.error.message || JSON.stringify(newsRes.error)}</div>`;
-                } else if (newsRes.data) {
-                    const newsData = newsRes.data;
-                    if (newsData.length === 0) {
-                        feedEl.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 20px;">Новостей пока нет</div>`;
-                    } else {
-                        feedEl.innerHTML = '';
-                        newsData.forEach(item => {
-                            let dateStr = "Дата неизвестна";
-                            try {
-                                let safeDateStr = item.created_at;
-                                if (safeDateStr) {
-                                    // Safari Bug Fix: ЖЕСТКО вырезаем микросекунды, иначе iOS падает в обморок
-                                    safeDateStr = safeDateStr.replace(/\.\d+/, ''); 
-                                    safeDateStr = safeDateStr.replace(' ', 'T');
-                                }
-                                dateStr = new Date(safeDateStr).toLocaleString('ru-RU', { 
-                                    timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
-                                });
-                            } catch (dateErr) {
-                                dateStr = item.created_at; 
-                            }
+async function handleLogout() {
+await db.auth.signOut();
+window.location.reload();
+}
 
-                            feedEl.innerHTML += `
-                                <div class="card">
-                                    <div class="news-date">${dateStr}</div>
-                                    <div class="news-title">${item.title}</div>
-                                    <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
-                                </div>
-                            `;
-                        });
-                    }
-                }
+// --- ЗАГРУЗКА ДАННЫХ (НОВАЯ, ПУЛЕНЕПРОБИВАЕМАЯ) ---
+async function loadUserData() {
+if (!currentUser) return;
 
-                // === 2. ОБРАБАТЫВАЕМ НАСТРОЙКИ ===
-                let fetchedIp = 'Ошибка загрузки IP';
-                let fetchedDomain = 'Ошибка загрузки домена';
-                let fetchedNaiveDomain = 'Ошибка загрузки Naive домена';
-                const emailBox = document.getElementById('admin-email-box');
+try {
+// Запускаем ВСЕ ТРИ запроса одновременно
+const [userRes, settingsRes, newsRes] = await Promise.all([
+db.from('vpn_users').select('tg_id, links, username, tt_password').eq('email', currentUser.email).single(),
+db.from('app_settings').select('setting_key, setting_value').in('setting_key', ['admin_email', 'tt_ip', 'tt_domain', 'naive_domain']),
+db.from('news').select('*').order('created_at', { ascending: false })
+]);
 
-                if (settingsRes.data) {
-                    settingsRes.data.forEach(setting => {
-                        if (setting.setting_key === 'admin_email') {
-                            emailBox.innerText = setting.setting_value;
-                            emailBox.href = `mailto:${setting.setting_value}`; 
-                        }
-                        if (setting.setting_key === 'tt_ip') fetchedIp = setting.setting_value;
-                        if (setting.setting_key === 'tt_domain') fetchedDomain = setting.setting_value;
-                        if (setting.setting_key === 'naive_domain') fetchedNaiveDomain = setting.setting_value;
-                    });
-                } else {
-                    emailBox.innerText = 'Почта временно недоступна';
-                }
+// === 1. ВЫВОДИМ НОВОСТИ В ПЕРВУЮ ОЧЕРЕДЬ ===
+try {
+const newsData = newsRes.data;
+const feedEl = document.getElementById('news-feed');
 
-                // === 3. ОБРАБАТЫВАЕМ ПРОФИЛЬ ===
-                if (userRes.error) {
-                    document.getElementById('sub-link-box').innerText = `Ошибка БД: ${userRes.error.message || JSON.stringify(userRes.error)}`;
-                    document.getElementById('raw-links-container').innerText = 'Не удалось загрузить ключи';
-                } else if (userRes.data) {
-                    const userData = userRes.data;
-                    userTgId = userData.tg_id;
-                    document.getElementById('sub-link-box').innerText = `${DENO_API_URL}/?tg_id=${userTgId}`;
+if (newsRes.error) {
+feedEl.innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Ошибка загрузки: ${newsRes.error.message}</div>`;
+} else if (newsData) {
+if (newsData.length === 0) {
+feedEl.innerHTML = `<div style="color: var(--text-secondary); text-align: center; padding: 20px;">Новостей пока нет</div>`;
+} else {
+feedEl.innerHTML = '';
+newsData.forEach(item => {
+// ИСПРАВЛЕНИЕ SAFARI DATE BUG:
+// Safari падает в обморок, если формат даты ему не нравится
+let dateStr = "Дата неизвестна";
+try {
+// Жестко приводим дату к формату, который понимает Apple
+let safeDateStr = item.created_at;
+if (safeDateStr) {
+safeDateStr = safeDateStr.replace(' ', 'T');
+}
 
-                    const rawContainer = document.getElementById('raw-links-container');
-                    if (userData.links && userData.links.length > 0) {
-                        rawContainer.innerHTML = ''; 
-                        userData.links.forEach((link) => {
-                            rawContainer.innerHTML += `
-                                <div class="copy-box" style="margin-bottom: 10px; cursor: pointer; text-align: center;" onclick="copyToClipboard('${link}', this)">
-                                    ${link}
-                                </div>
-                            `;
-                        });
-                    }
+dateStr = new Date(safeDateStr).toLocaleString('ru-RU', { 
+timeZone: 'Europe/Moscow', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' 
+});
+} catch (dateErr) {
+// Если Safari всё еще недоволен, просто выводим сырую дату из базы, чтобы не крашить приложение
+dateStr = item.created_at; 
+}
 
-                    if (userData.username && userData.tt_password) {
-                        document.getElementById('tt-card').style.display = 'block';
-                        document.getElementById('naive-card').style.display = 'block';
-                        
-                        document.getElementById('tt-login-box').innerText = userData.username;
-                        document.getElementById('tt-password-box').innerText = userData.tt_password;
-                        document.getElementById('tt-ip-box').innerText = fetchedIp;
-                        document.getElementById('tt-domain-box').innerText = fetchedDomain;
+feedEl.innerHTML += `
+                                   <div class="card">
+                                       <div class="news-date">${dateStr}</div>
+                                       <div class="news-title">${item.title}</div>
+                                       <div style="color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere;">${item.content}</div>
+                                   </div>
+                               `;
+});
+}
+}
+} catch (newsErr) {
+// ТЕПЕРЬ ОШИБКА ТОЧНО ПОЯВИТСЯ НА ЭКРАНЕ, А НЕ В СКРЫТОЙ КОНСОЛИ
+document.getElementById('news-feed').innerHTML = `<div style="color: var(--danger); padding: 10px; border: 1px solid var(--danger); border-radius: 10px;">Сбой рендера новостей (Safari): ${newsErr.message}</div>`;
+}
 
-                        const naiveConfig = [{
-                            "server": fetchedNaiveDomain,
-                            "server_port": 443,
-                            "tag": "Bukvi Naive",
-                            "type": "naive",
-                            "username": userData.username,
-                            "password": userData.tt_password,
-                            "udp_over_tcp": { "enabled": true },
-                            "quic": false,
-                            "tls": { "enabled": true }
-                        }];
+// === 2. ОБРАБАТЫВАЕМ НАСТРОЙКИ ===
+let fetchedIp = 'Ошибка загрузки IP';
+let fetchedDomain = 'Ошибка загрузки домена';
+let fetchedNaiveDomain = 'Ошибка загрузки Naive домена';
+const emailBox = document.getElementById('admin-email-box');
 
-                        const base64Content = btoa(unescape(encodeURIComponent(JSON.stringify(naiveConfig))));
-                        const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
-                        
-                        document.getElementById('naive-link-box').innerText = finalUlink;
-                        
-                        // ИСПРАВЛЕНИЕ: Мы вернули строчки, которые вы случайно удалили! Теперь кнопка появится.
-                        document.getElementById('naive-magic-btn').href = finalUlink;
-                        document.getElementById('naive-magic-btn').style.display = 'block';
-                    }
-                }
-            } catch (err) {
-                console.error("Глобальная ошибка загрузки:", err);
-                document.getElementById('news-feed').innerHTML += `<div style="color: var(--danger); padding: 10px;">Критический сбой: ${err.message}</div>`;
-            }
-        }
+if (settingsRes.data) {
+settingsRes.data.forEach(setting => {
+if (setting.setting_key === 'admin_email') {
+emailBox.innerText = setting.setting_value;
+emailBox.href = `mailto:${setting.setting_value}`; 
+}
+if (setting.setting_key === 'tt_ip') fetchedIp = setting.setting_value;
+if (setting.setting_key === 'tt_domain') fetchedDomain = setting.setting_value;
+if (setting.setting_key === 'naive_domain') fetchedNaiveDomain = setting.setting_value;
+});
+} else {
+emailBox.innerText = 'Почта временно недоступна';
+}
 
-        function copyBypassList(btnElement) {
-            const rawText = document.getElementById('bypass-list').textContent;
-            const cleanList = rawText.split(/\s+/).filter(item => item.length > 0).join('\n');
-            copyToClipboard(cleanList, btnElement);
-        }
+// === 3. ОБРАБАТЫВАЕМ ПРОФИЛЬ ===
+const userData = userRes.data;
+if (userData) {
+userTgId = userData.tg_id;
+document.getElementById('sub-link-box').innerText = `${DENO_API_URL}/?tg_id=${userTgId}`;
 
-        async function copyToClipboard(text, element) {
-            try {
-                await navigator.clipboard.writeText(text);
-                const originalText = element.innerText;
-                const originalBg = element.style.backgroundColor;
-                const originalColor = element.style.color;
+const rawContainer = document.getElementById('raw-links-container');
+if (userData.links && userData.links.length > 0) {
+rawContainer.innerHTML = ''; 
+userData.links.forEach((link) => {
+rawContainer.innerHTML += `
+                               <div class="copy-box" style="margin-bottom: 10px; cursor: pointer; text-align: center;" onclick="copyToClipboard('${link}', this)">
+                                   ${link}
+                               </div>
+                           `;
+});
+}
 
-                element.innerText = '✅ Скопировано!';
-                element.style.backgroundColor = '#10b981';
-                element.style.color = '#ffffff';
+if (userData.username && userData.tt_password) {
+document.getElementById('tt-card').style.display = 'block';
+document.getElementById('naive-card').style.display = 'block';
 
-                setTimeout(() => {
-                    element.innerText = originalText;
-                    element.style.backgroundColor = originalBg;
-                    element.style.color = originalColor;
-                }, 2000);
-            } catch (err) {
-                console.error('Ошибка копирования: ', err);
-                alert('Не удалось скопировать, проверьте разрешения браузера.');
-            }
-        }
+document.getElementById('tt-login-box').innerText = userData.username;
+document.getElementById('tt-password-box').innerText = userData.tt_password;
+document.getElementById('tt-ip-box').innerText = fetchedIp;
+document.getElementById('tt-domain-box').innerText = fetchedDomain;
 
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-'+screenId).classList.add('active');
-        }
+const naiveConfig = [{
+"server": fetchedNaiveDomain,
+"server_port": 443,
+"tag": "Bukvi Naive",
+"type": "naive",
+"username": userData.username,
+"password": userData.tt_password,
+"udp_over_tcp": { "enabled": true },
+"quic": false,
+"tls": { "enabled": true }
+}];
 
-        function showLogin() { showScreen('login'); }
+// ИСПРАВЛЕНО: Безопасное кодирование (защита от кириллицы)
+const base64Content = btoa(unescape(encodeURIComponent(JSON.stringify(naiveConfig))));
+const finalUlink = `ulink://install/?content=${base64Content}&format=json#Bukvi_Naive`;
 
-        function showApp() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen-loading').style.display = 'none';
-            document.getElementById('app-content').style.display = 'block';
-            document.getElementById('tabbar').style.display = 'flex';
-            switchTab('news');
-        }
+document.getElementById('naive-link-box').innerText = finalUlink;
+}
+} else {
+document.getElementById('sub-link-box').innerText = 'Ваш email не найден в базе VPN.';
+document.getElementById('raw-links-container').innerText = 'Пусто';
+}
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-'+tabId).classList.add('active');
-            
-            document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
-            const activeBtn = document.querySelector(`.tab-item[onclick="switchTab('${tabId}')"]`);
-            if(activeBtn) activeBtn.classList.add('active');
-        }
+} catch (err) {
+console.error("Глобальная ошибка загрузки:", err);
+document.getElementById('news-feed').innerHTML = `<div style="color: var(--danger); padding: 10px;">Критический сбой: ${err.message}</div>`;
+}
+}
 
-        window.onload = initApp;
-    </script>
+function copyBypassList(btnElement) {
+const rawText = document.getElementById('bypass-list').textContent;
+const cleanList = rawText.split(/\s+/).filter(item => item.length > 0).join('\n');
+copyToClipboard(cleanList, btnElement);
+}
+
+async function copyToClipboard(text, element) {
+try {
+await navigator.clipboard.writeText(text);
+const originalText = element.innerText;
+const originalBg = element.style.backgroundColor;
+const originalColor = element.style.color;
+
+element.innerText = '✅ Скопировано!';
+element.style.backgroundColor = '#10b981';
+element.style.color = '#ffffff';
+
+setTimeout(() => {
+element.innerText = originalText;
+element.style.backgroundColor = originalBg;
+element.style.color = originalColor;
+}, 2000);
+} catch (err) {
+console.error('Ошибка копирования: ', err);
+alert('Не удалось скопировать, проверьте разрешения браузера.');
+}
+}
+
+function showScreen(screenId) {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-'+screenId).classList.add('active');
+}
+
+function showLogin() { showScreen('login'); }
+
+function showApp() {
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-loading').style.display = 'none';
+document.getElementById('app-content').style.display = 'block';
+document.getElementById('tabbar').style.display = 'flex';
+switchTab('news');
+}
+
+function switchTab(tabId) {
+document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+document.getElementById('tab-'+tabId).classList.add('active');
+
+document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+const activeBtn = document.querySelector(`.tab-item[onclick="switchTab('${tabId}')"]`);
+if(activeBtn) activeBtn.classList.add('active');
+}
+
+window.onload = initApp;
+</script>
 </body>
 </html>
