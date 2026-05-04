@@ -57,17 +57,28 @@
         #screen-onboarding {
             padding: 40px 20px;
             text-align: center;
-            justify-content: space-between;
+            /* Убираем space-between, чтобы контент не разлетался */
+            justify-content: center; 
+            align-items: center;
             overflow-y: auto; 
             padding-bottom: 40px; 
+            gap: 20px; /* Добавляем небольшое расстояние между элементами */
         }
 
         .ob-slide img {
-            max-width: 80%;
-            height: auto;
+            width: 100%;
+            /* Ограничиваем ширину и высоту для больших экранов */
+            max-width: 400px; 
+            max-height: 50vh; 
+            object-fit: contain; /* Чтобы картинка не искажалась */
             border-radius: 20px;
             margin-bottom: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Чтобы кнопка на десктопе не растягивалась на всю ширину */
+        #screen-onboarding .btn {
+            max-width: 400px;
         }
 
         #screen-login {
