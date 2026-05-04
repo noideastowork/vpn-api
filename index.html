@@ -35,20 +35,23 @@
             overflow: hidden;
         }
 
+        /* Экраны (Секции) */
         .screen {
             display: none;
             flex-direction: column;
             height: 100%;
             width: 100%;
             overflow-y: auto;
-            padding-bottom: 80px; 
             box-sizing: border-box;
+            /* Мы убрали отсюда padding-bottom: 80px, так как таббар есть не везде */
         }
 
-        .screen.active {
-            display: flex;
+        /* Добавляем новый класс: Отступ под таббар будет ТОЛЬКО во вкладках с меню */
+        .tab-content {
+            padding-bottom: 80px; 
         }
 
+        /* Загрузка */
         #screen-loading {
             justify-content: center;
             align-items: center;
@@ -56,34 +59,28 @@
 
         /* Онбординг (PWA) */
         #screen-onboarding {
-            padding: 40px 20px;
+            padding: 20px;
             text-align: center;
-            justify-content: center; /* Центрируем по вертикали */
-            align-items: center; /* Центрируем по горизонтали */
-            gap: 40px; /* Отступ между блоком с текстом/картинкой и кнопкой */
-            overflow-y: auto; 
-            padding-bottom: 40px; 
+            justify-content: center;
+            align-items: center;
         }
 
         .ob-slide {
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%;
         }
 
         .ob-slide img {
             width: 100%;
-            max-width: 350px; /* Жесткий лимит ширины для компов */
-            max-height: 45vh; /* Защита по высоте: не больше половины экрана */
-            object-fit: contain; /* Картинка всегда будет помещаться и не обрезаться */
+            max-width: 350px;
+            max-height: 45vh;
+            object-fit: contain;
             border-radius: 20px;
             margin-bottom: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-
-        /* Не даем кнопке растянуться на весь широкий экран */
-        #screen-onboarding .btn {
-            max-width: 350px;
+            flex-shrink: 0; /* Запрещаем картинке сплющиваться */
         }
 
         #screen-login {
@@ -167,6 +164,13 @@
             cursor: pointer;
             width: 100%;
             transition: all 0.2s; 
+            flex-shrink: 0; /* ВОТ МАГИЯ: Запрещаем кнопкам сплющиваться в блин! */
+        }
+
+        /* Не даем кнопке растянуться на весь широкий экран на Маке */
+        #screen-onboarding .btn {
+            max-width: 350px;
+            margin-top: 15px;
         }
 
         .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 20px;}
