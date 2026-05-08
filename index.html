@@ -248,6 +248,44 @@
                     <div class="news-title">Cсылки-подписки</div>
                     <div class="news-date">Нажмите на любой ключ, чтобы скопировать его.</div>
                     <div id="raw-links-container">Загрузка ключей...</div>
+                   
+                    <!-- КНОПКА ИНСТРУКЦИИ KARING -->
+                    <button class="btn btn-secondary" onclick="toggleKaring()">📖 Инструкция для Karing</button>
+                    
+                    <!-- СКРЫТЫЙ БЛОК ИНСТРУКЦИИ -->
+                    <div id="karing-instruction" class="instruction-block">
+                        <h3>Шаг 1. Установка</h3>
+                        <p>• <b>iOS:</b> Установите напрямую из App Store.<br>
+                           • <b>Android, Windows, macOS:</b> Скачайте версию на GitHub.</p>
+                        
+                        <h3>Шаг 2. Первый запуск</h3>
+                        <p>При открытии нажимайте «Next», пока не дойдете до экрана «Add Profile»:</p>
+                        <ul>
+                            <li>Нажмите <b>Accept & Continue</b>.</li>
+                            <li>Язык: <b>English</b>.</li>
+                            <li>Регион: <b>Russian Federation</b>.</li>
+                            <li>Preset [Custom diversion rules]: <b>ничего не меняйте</b>.</li>
+                            <li>Novice mode: <b>включено</b>.</li>
+                            <li>Нажмите <b>Done</b>.</li>
+                        </ul>
+
+                        <h3>Шаг 3. Импорт настроек</h3>
+                        <p>На экране «Add Profile» (или на главном нажмите Add Profile):</p>
+                        <ul>
+                            <li>Выберите <b>Backup and Sync</b>.</li>
+                            <li>Выберите <b>Import and Export</b>.</li>
+                            <li>Нажмите <b>Import from URL</b>.</li>
+                        </ul>
+                        <div class="copy-box" style="font-size: 10px; background: #000; margin-bottom: 10px;" onclick="copyToClipboard('https://github.com/noideastowork/vpn-api/blob/main/FAQ/Karing_1.2.3.857_ios_2026-03-16-1246.backup.zip', this)">https://github.com/noideastowork/vpn-api/blob/main/FAQ/Karing_1.2.3.857_ios_2026-03-16-1246.backup.zip</div>
+                        <p>В появившемся окне нажмите <b>OK</b>.</p>
+                        <p style="color: var(--danger);"><b>Важно:</b> Полностью перезапустите приложение для вступления настроек в силу.</p>
+
+                        <h3>Шаг 4. Добавление подписок</h3>
+                        <p>1. Скопируйте первую ссылку-подписку выше.<br>
+                           2. В Karing нажмите <b>Add</b> -> <b>Import From Clipboard</b>.<br>
+                           3. Нажмите галочку в углу.<br>
+                           4. Повторите для второй ссылки.</p>
+                    </div>
                 </div>
 
                 <div class="card" id="tt-card" style="display: none; border: 1px solid #10b981;">
