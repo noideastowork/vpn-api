@@ -178,7 +178,13 @@
             transition: all 0.2s; 
         }
 
-        /* Стили для инструкции Karing */
+       /* --- Стили для инструкции Karing --- */
+        .btn-secondary {
+            background-color: #444;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
         .instruction-block {
             display: none;
             background: rgba(0,0,0,0.2);
@@ -192,7 +198,12 @@
         .instruction-block h3 {
             font-size: 16px;
             margin-bottom: 10px;
+            margin-top: 20px;
             color: var(--accent);
+        }
+        
+        .instruction-block h3:first-child {
+            margin-top: 0;
         }
 
         .instruction-block p, .instruction-block li {
@@ -200,6 +211,7 @@
             color: #ccc;
             line-height: 1.5;
             margin-bottom: 8px;
+            margin-top: 0;
         }
 
         .instruction-block b { color: #fff; }
@@ -274,43 +286,55 @@
                     <div class="news-title">Cсылки-подписки</div>
                     <div class="news-date">Нажмите на любой ключ, чтобы скопировать его.</div>
                     <div id="raw-links-container">Загрузка ключей...</div>
-                   
-                    <!-- КНОПКА ИНСТРУКЦИИ KARING -->
+
+                    <!-- Кнопка для открытия инструкции -->
                     <button class="btn btn-secondary" onclick="toggleKaring()">📖 Инструкция для Karing</button>
                     
-                    <!-- СКРЫТЫЙ БЛОК ИНСТРУКЦИИ -->
+                    <!-- Скрытый блок инструкции -->
                     <div id="karing-instruction" class="instruction-block">
                         <h3>Шаг 1. Установка</h3>
-                        <p>• <b>iOS:</b> Установите напрямую из App Store.<br>
-                           • <b>Android, Windows, macOS:</b> Скачайте версию на GitHub.</p>
-                        
+                        <p><b>iOS:</b> Установите напрямую из App Store.<br>
+                        <b>Android, Windows, macOS:</b> Скачайте актуальную версию со страницы релизов GitHub - https://github.com/KaringX/karing/releases/latest</p>
+                        <ul>
+                            <li><b>Android:</b> файл android_arm.apk</li>
+                            <li><b>Windows:</b> файл windows_x64.exe</li>
+                            <li><b>macOS:</b> файл macos_universal.dmg</li>
+                        </ul>
+
                         <h3>Шаг 2. Первый запуск</h3>
-                        <p>При открытии нажимайте «Next», пока не дойдете до экрана «Add Profile»:</p>
+                        <p>При открытии приложения нажимайте «Next», пока не дойдете до экрана «Add Profile»:</p>
                         <ul>
                             <li>Нажмите <b>Accept & Continue</b>.</li>
-                            <li>Язык: <b>English</b>.</li>
-                            <li>Регион: <b>Russian Federation</b>.</li>
-                            <li>Preset [Custom diversion rules]: <b>ничего не меняйте</b>.</li>
-                            <li>Novice mode: <b>включено</b>.</li>
+                            <li>Выберите язык: <b>English</b>.</li>
+                            <li>Выберите регион: <b>Russian Federation</b> (если не определился автоматически).</li>
+                            <li>Экран Preset [Custom diversion rules]: <b>ничего не меняйте</b>.</li>
+                            <li>Параметр Novice mode: <b>оставьте включенным</b>.</li>
                             <li>Нажмите <b>Done</b>.</li>
                         </ul>
 
                         <h3>Шаг 3. Импорт настроек</h3>
-                        <p>На экране «Add Profile» (или на главном нажмите Add Profile):</p>
+                        <p>Вы оказались на экране «Add Profile». Если нет, то на главном экране нажмите Add Profile.</p>
                         <ul>
-                            <li>Выберите <b>Backup and Sync</b>.</li>
-                            <li>Выберите <b>Import and Export</b>.</li>
-                            <li>Нажмите <b>Import from URL</b>.</li>
+                            <li>Выберите пункт <b>Backup and Sync</b></li>
+                            <li>Выберте <b>Import and Export</b></li>
+                            <li>Нажмите <b>Import from URL</b></li>
                         </ul>
-                        <div class="copy-box" style="font-size: 10px; background: #000; margin-bottom: 10px;" onclick="copyToClipboard('https://github.com/noideastowork/vpn-api/blob/main/FAQ/Karing_1.2.3.857_ios_2026-03-16-1246.backup.zip', this)">https://github.com/noideastowork/vpn-api/blob/main/FAQ/Karing_1.2.3.857_ios_2026-03-16-1246.backup.zip</div>
+                        <p>Вставьте следующую ссылку:</p>
+                        
+                        <!-- Ссылка сделана кликабельной для удобного копирования -->
+                        <div class="copy-box" style="cursor: pointer; color: var(--accent); margin-bottom: 10px;" onclick="copyToClipboard(this.innerText.trim(), this)">
+                            https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Karing_1.2.3.857_ios_2026-03-16-1246.backup.zip
+                        </div>
+                        
                         <p>В появившемся окне нажмите <b>OK</b>.</p>
-                        <p style="color: var(--danger);"><b>Важно:</b> Полностью перезапустите приложение для вступления настроек в силу.</p>
+                        <p style="color: var(--danger);"><b>Важно:</b> Полностью перезапустите приложение (или перезагрузите устройство), чтобы настройки вступили в силу.</p>
 
                         <h3>Шаг 4. Добавление подписок</h3>
-                        <p>1. Скопируйте первую ссылку-подписку выше.<br>
-                           2. В Karing нажмите <b>Add</b> -> <b>Import From Clipboard</b>.<br>
-                           3. Нажмите галочку в углу.<br>
-                           4. Повторите для второй ссылки.</p>
+                        <p>1. Скопируйте первую ссылку-подписку из этого приложения.<br>
+                        2. В Karing нажмите кнопку <b>Add</b>.<br>
+                        3. Выберите <b>Import From Clipboard</b>.<br>
+                        4. Нажмите галочку в правом верхнем углу для сохранения.<br>
+                        5. Повторите те же действия для второй ссылки.</p>
                     </div>
                 </div>
 
@@ -850,6 +874,12 @@
             }
         }
 
+       // Открытие/закрытие инструкции Karing
+        function toggleKaring() {
+            const el = document.getElementById('karing-instruction');
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+       
         function copyBypassList(btnElement) {
             const rawText = document.getElementById('bypass-list').textContent;
             const cleanList = rawText.split(/\s+/).filter(item => item.length > 0).join('\n');
