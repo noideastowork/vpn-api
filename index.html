@@ -178,6 +178,32 @@
             transition: all 0.2s; 
         }
 
+        /* Стили для инструкции Karing */
+        .instruction-block {
+            display: none;
+            background: rgba(0,0,0,0.2);
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+            border: 1px dashed #555;
+        }
+
+        .instruction-block h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .instruction-block p, .instruction-block li {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .instruction-block b { color: #fff; }
+
         /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ (Планшеты и ПК) === */
         @media (min-width: 768px) {
             /* 1. Центрируем контент и не даем ему расти больше 800px */
