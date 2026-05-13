@@ -15,14 +15,12 @@
 
     <style>
         :root {
-            /* Цветовая палитра из референса */
-            --bg-color: #000000; /* Глубокий чёрный фон */
-            --card-bg: #1C1C1E; /* Мягкий графитовый для карточек */
-            --text-main: #FFFFFF;
-            --text-secondary: #8E8E93; /* Приятный серый для доп. текста */
-            --accent: #C3B1E1; /* Тот самый мягкий фиолетовый/лавандовый */
-            --danger-bg: rgba(255, 69, 58, 0.15); /* Полупрозрачный красный для фона опасных кнопок */
-            --danger-text: #FF453A;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-main: #ffffff;
+            --text-secondary: #aaaaaa;
+            --accent: #3b82f6; 
+            --danger: #ef4444;
         }
 
         body {
@@ -35,31 +33,20 @@
             flex-direction: column;
             height: 100dvh; 
             overflow: hidden;
-            -webkit-font-smoothing: antialiased; /* Делает шрифты более гладкими на Mac/iOS */
         }
 
-        /* Экраны (Секции) */
         .screen {
             display: none;
             flex-direction: column;
             height: 100%;
             width: 100%;
             overflow-y: auto;
+            padding-bottom: 80px; 
             box-sizing: border-box;
         }
-        
-        /* --- ЭТУ МАГИЧЕСКУЮ СТРОЧКУ Я ЗАБЫЛ ДОБАВИТЬ --- */
+
         .screen.active {
             display: flex;
-        }
-        /* ----------------------------------------------- */
-
-        .tab-content {
-            padding-bottom: 100px;
-        }
-
-        .tab-content {
-            padding-bottom: 100px; /* Чуть больше места снизу для "воздуха" */
         }
 
         #screen-loading {
@@ -70,25 +57,28 @@
         #screen-onboarding {
             padding: 40px 20px;
             text-align: center;
-        }
-
-        .ob-slide {
-            margin: auto 0;
-            display: flex;
-            flex-direction: column;
+            /* Убираем space-between, чтобы контент не разлетался */
+            justify-content: center; 
             align-items: center;
-            width: 100%;
+            overflow-y: auto; 
+            padding-bottom: 40px; 
+            gap: 20px; /* Добавляем небольшое расстояние между элементами */
         }
 
         .ob-slide img {
             width: 100%;
-            max-width: 350px;
-            max-height: 45vh;
-            object-fit: contain;
-            border-radius: 32px; /* Увеличили скругление как на картинке */
-            margin-bottom: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6); /* Более объемная тень */
-            flex-shrink: 0;
+            /* Ограничиваем ширину и высоту для больших экранов */
+            max-width: 400px; 
+            max-height: 50vh; 
+            object-fit: contain; /* Чтобы картинка не искажалась */
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Чтобы кнопка на десктопе не растягивалась на всю ширину */
+        #screen-onboarding .btn {
+            max-width: 400px;
         }
 
         #screen-login {
@@ -100,37 +90,28 @@
         input {
             width: 100%;
             max-width: 800px;
-            padding: 18px;
-            border-radius: 20px; /* Округлые инпуты */
-            border: 1px solid #2C2C2E;
-            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #333;
             color: #fff;
             font-size: 16px;
             margin-bottom: 15px;
             box-sizing: border-box;
-            transition: all 0.3s ease;
         }
 
-        input:focus {
-            outline: none;
-            border-color: var(--accent); /* Подсветка фиолетовым при вводе */
-        }
-
-        /* Таббар (нижнее меню) */
         #tabbar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 80px;
-            background: rgba(28, 28, 30, 0.85); /* Полупрозрачный цвет карточек */
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            height: 70px;
+            background: rgba(45, 45, 45, 0.95);
+            backdrop-filter: blur(10px);
             display: none;
             justify-content: space-around;
             align-items: center;
-            border-top: none; /* Убрали жесткую линию */
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5); /* Добавили мягкую тень */
+            border-top: 1px solid #444;
             z-index: 100;
         }
 
@@ -138,153 +119,126 @@
             color: var(--text-secondary);
             text-align: center;
             font-size: 12px;
-            font-weight: 500;
             text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: color 0.2s;
         }
 
         .tab-item.active {
-            color: var(--text-main); /* Белый цвет для активного таба (смотрится дороже) */
+            color: var(--accent);
         }
 
         .tab-icon {
             font-size: 24px;
-            margin-bottom: 6px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-
-        .tab-item.active .tab-icon {
-            opacity: 1; /* Яркая иконка у активного таба */
+            margin-bottom: 4px;
         }
 
         .container {
-            padding: 24px 20px;
+            padding: 20px;
         }
 
-        /* Типографика */
-        h1 { margin-top: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
-        h2 { color: var(--text-secondary); font-size: 16px; font-weight: 400; margin-bottom: 24px; line-height: 1.4; }
+        h1 { margin-top: 0; font-size: 28px; }
+        h2 { color: var(--text-secondary); font-size: 18px; margin-bottom: 20px; }
 
-        /* Карточки */
         .card {
             background: var(--card-bg);
-            border-radius: 28px; /* ОГРОМНЫЕ скругления как на референсе */
-            padding: 24px;
-            margin-bottom: 16px;
-            border: none !important; /* Убираем бордеры, если где-то были */
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
         }
 
-        .news-date { color: var(--text-secondary); font-size: 12px; margin-bottom: 8px; font-weight: 500; }
-        .news-title { font-weight: 600; font-size: 18px; margin-bottom: 12px; letter-spacing: -0.3px; }
+        .news-date { color: var(--text-secondary); font-size: 12px; margin-bottom: 5px; }
+        .news-title { font-weight: bold; font-size: 18px; margin-bottom: 10px; }
 
-        /* КНОПКИ (Стиль "Таблетка") */
         .btn {
             background-color: var(--accent);
-            color: #000000; /* Чёрный текст на цветном фоне = премиум */
+            color: white;
             border: none;
-            padding: 16px 20px;
-            border-radius: 100px; /* Полностью круглые края */
-            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
             font-size: 16px;
             cursor: pointer;
             width: 100%;
-            transition: transform 0.1s, opacity 0.2s; 
-            flex-shrink: 0;
-            min-height: 52px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-        }
-
-        .btn:active {
-            transform: scale(0.97); /* Приятный эффект нажатия */
-        }
-
-        .btn-secondary {
-            background-color: #2C2C2E; /* Светло-серый для второстепенных */
-            color: var(--text-main);
-            margin-top: 20px;
-        }
-
-        /* Красивая кнопка выхода */
-        .btn-danger { 
-            background-color: var(--danger-bg); 
-            color: var(--danger-text);
-            margin-top: 30px; 
-            margin-bottom: 20px;
-        }
-
-        /* Поля с кодами (вдавленный эффект) */
-        .copy-box {
-            background: #000000; /* Истинно черный внутри серой карточки */
-            padding: 14px 16px;
-            border-radius: 16px;
-            font-family: monospace;
-            font-size: 13px;
-            word-break: break-all;
-            margin-top: 12px;
-            border: 1px solid #2C2C2E;
-            color: var(--text-secondary);
             transition: all 0.2s; 
         }
 
-        /* --- Стили для инструкции Karing --- */
+        .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 60px;}
+
+        .copy-box {
+            background: #111;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-top: 10px;
+            border: 1px solid #333;
+            transition: all 0.2s; 
+        }
+
+       /* --- Стили для инструкции Karing --- */
+        .btn-secondary {
+            background-color: #444;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
         .instruction-block {
             display: none;
-            background: #000000; /* Темный фон для контраста */
+            background: rgba(0,0,0,0.2);
             margin-top: 15px;
-            padding: 20px;
-            border-radius: 20px;
+            padding: 15px;
+            border-radius: 10px;
             text-align: left;
-            border: 1px solid #2C2C2E;
+            border: 1px dashed #555;
         }
 
         .instruction-block h3 {
-            font-size: 15px;
-            margin-bottom: 12px;
-            margin-top: 24px;
-            color: var(--text-main);
-            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 10px;
+            margin-top: 20px;
+            color: var(--accent);
         }
         
-        .instruction-block h3:first-child { margin-top: 0; }
-
-        .instruction-block p, .instruction-block li {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            margin-bottom: 10px;
+        .instruction-block h3:first-child {
             margin-top: 0;
         }
 
-        .instruction-block b { color: var(--text-main); font-weight: 600; }
+        .instruction-block p, .instruction-block li {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
 
+        /* Добавляем отступы для списков, чтобы маркеры не прилипали к левому краю */
         .instruction-block ul {
             padding-left: 20px;
             margin-top: 5px;
         }
 
-        /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ === */
+        .instruction-block b { color: #fff; }
+
+        /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ (Планшеты и ПК) === */
         @media (min-width: 768px) {
+            /* 1. Центрируем контент и не даем ему расти больше 800px */
             .container {
-                max-width: 800px;
-                margin: 0 auto;
+                max-width: 800px; /* Идеальная ширина для комфортного чтения */
+                margin: 0 auto;   /* Магия центрирования */
             }
+
+            /* 2. Собираем нижнее меню в центре, чтобы оно не растягивалось на 2 метра */
             #tabbar {
                 max-width: 800px;
                 left: 50%;
-                transform: translateX(-50%);
-                border-left: 1px solid #2C2C2E;
-                border-right: 1px solid #2C2C2E;
-                border-radius: 32px 32px 0 0;
+                transform: translateX(-50%); /* Сдвигаем ровно по центру */
+                border-left: 1px solid #444; /* Рамки по бокам */
+                border-right: 1px solid #444;
+                border-radius: 20px 20px 0 0; /* Скругляем верхние углы для стиля */
             }
-            .ob-slide img { max-width: 350px; }
-            #screen-onboarding .btn { max-width: 350px; margin: 15px auto 0; }
         }
     </style>
 </head>
