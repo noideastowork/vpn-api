@@ -39,7 +39,6 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            height: 100dvh; 
             overflow: hidden;
             -webkit-tap-highlight-color: transparent; /* УБИРАЕМ МИГАНИЕ НА ANDROID ВО ВСЕМ ПРИЛОЖЕНИИ */
         }
@@ -293,6 +292,12 @@
                 /* ДЕСКТОП: Жесткая высота 60px, отключаем отступ от "челки" айфона */
                 height: 60px; 
                 padding-bottom: 0; 
+            }
+           
+            #app-content {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
             }
         }
     </style>
