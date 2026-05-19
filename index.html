@@ -50,7 +50,7 @@
             min-height: 0;
             width: 100%;
             overflow-y: auto;
-            padding-bottom: 120px; /* Отступ с запасом, чтобы меню не перекрывало нижний текст */
+            padding-bottom: calc(90px + env(safe-area-inset-bottom));
             box-sizing: border-box;
         }
 
@@ -108,27 +108,36 @@
 
         /* --- НИЖНЕЕ МЕНЮ (ПОЛНОСТЬЮ ПЕРЕПИСАННОЕ) --- */
         #tabbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            /* ИДЕАЛЬНАЯ ФОРМУЛА ДЛЯ iPHONE: 70px под кнопки + место под челку */
-            min-height: calc(70px + env(safe-area-inset-bottom));
-            background: rgba(40, 42, 44, 0.85); /* Полупрозрачный фон */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: none;
-            flex-direction: row; /* Иконки строго в строку */
-            justify-content: center; 
-            gap: 20px; 
-            align-items: center; /* Центрируем иконки внутри 70px */
-            border-top: 1px solid #444;
-            z-index: 100;
-            box-sizing: border-box; /* Чтобы padding не раздувал высоту */
-        }
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+
+    height: calc(70px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+
+    background: rgba(40, 42, 44, 0.85);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    display: none;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    gap: 20px;
+
+    border-top: 1px solid #444;
+
+    z-index: 100;
+    box-sizing: border-box;
+}
 
         .tab-item {
             color: var(--text-secondary);
+            min-width: 56px;
+            min-height: 48px;
             text-decoration: none;
             display: flex;
             flex-direction: row; 
@@ -336,7 +345,7 @@
         <div id="login-msg" style="margin-top:15px; color: var(--text-secondary); text-align: center;"></div>
     </div>
 
-    <div id="app-content" style="display:none; height:100%;">
+    <div id="app-content">
         
         <div id="tab-news" class="tab-content screen active">
             <div class="container">
@@ -1001,7 +1010,7 @@
         function showApp() {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-loading').style.display = 'none';
-            document.getElementById('app-content').style.display = 'block';
+            document.getElementById('app-content').style.display = 'flex';
             document.getElementById('tabbar').style.display = 'flex';
             switchTab('news');
         }
