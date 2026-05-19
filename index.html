@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        :root {
+:root {
             --bg-color: #131314;
             --card-bg: #282a2c;
             --text-main: #e3e3e3;
@@ -41,7 +41,7 @@
             height: 100%;
             width: 100%;
             overflow-y: auto;
-            padding-bottom: 80px; 
+            padding-bottom: 100px; /* Сделал отступ чуть больше из-за нового таббара */
             box-sizing: border-box;
         }
 
@@ -57,26 +57,23 @@
         #screen-onboarding {
             padding: 40px 20px;
             text-align: center;
-            /* Убираем space-between, чтобы контент не разлетался */
             justify-content: center; 
             align-items: center;
             overflow-y: auto; 
             padding-bottom: 40px; 
-            gap: 20px; /* Добавляем небольшое расстояние между элементами */
+            gap: 20px; 
         }
 
         .ob-slide img {
             width: 100%;
-            /* Ограничиваем ширину и высоту для больших экранов */
             max-width: 400px; 
             max-height: 50vh; 
-            object-fit: contain; /* Чтобы картинка не искажалась */
+            object-fit: contain;
             border-radius: 20px;
             margin-bottom: 20px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
-        /* Чтобы кнопка на десктопе не растягивалась на всю ширину */
         #screen-onboarding .btn {
             max-width: 400px;
         }
@@ -100,35 +97,39 @@
             box-sizing: border-box;
         }
 
-/* --- НИЖНЕЕ МЕНЮ --- */
+        /* --- НИЖНЕЕ МЕНЮ (НОВОЕ, С ЗАЩИТОЙ ПОД IPHONE) --- */
         #tabbar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 80px; /* Чуть выше для удобства пальца */
+            /* Убрали жесткий height: 80px, теперь высота гибкая */
+            padding-top: 15px;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* env(...) дает отступ ровно на высоту полоски Айфона */
             background: #282a2cc4;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: none;
-            justify-content: center; /* Собираем элементы в центре */
-            gap: 20px; /* Расстояние между вкладками */
+            flex-direction: row;
+            justify-content: center; 
+            gap: 20px; 
             align-items: center;
             border-top: 1px solid #444;
             z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom); /* Защита от полоски на iPhone */
+            box-sizing: border-box;
         }
 
         .tab-item {
             color: var(--text-secondary);
             text-decoration: none;
             display: flex;
+            flex-direction: row; /* Жестко в строку, чтобы текст был сбоку */
             align-items: center;
             justify-content: center;
             padding: 12px;
-            border-radius: 100px; /* Форма капсулы */
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* UPD. Теперь с 0.9 на 0.5, ибо в трех местах поменял. UPD. А теперь с 0.7 до 0.9. До этого увеличил с 0.3 до 0.7 */
-            gap: 0; /* Изначально отступа нет, текст скрыт */
+            border-radius: 100px; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 0; 
         }
 
         .tab-icon {
@@ -139,46 +140,42 @@
             justify-content: center;
         }
 
-        /* Неактивная иконка: только обводка (line-art) */
         .tab-icon svg {
             width: 24px;
             height: 24px;
             stroke: currentColor;
             stroke-width: 2;
             fill: none;
-            transition: all 0.5s ease;
+            transition: all 0.4s ease;
         }
 
         .tab-label {
             font-size: 14px;
             font-weight: 600;
-            max-width: 0; /* Прячем текст нулевой шириной */
+            max-width: 0; 
             opacity: 0;
             overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
         }
 
-        /* --- АКТИВНОЕ СОСТОЯНИЕ --- */
         .tab-item.active {
-            /* color-mix делает фон на 15% прозрачным от вашего цвета --accent */
             background-color: color-mix(in srgb, var(--accent) 15%, transparent);
-            color: var(--accent); /* Красим текст и иконку */
-            padding: 12px 20px; /* Расширяем плашку */
-            gap: 8px; /* Появляется отступ между иконкой и текстом */
+            color: var(--accent); 
+            padding: 12px 20px; 
+            gap: 8px; 
         }
 
-        /* Текст плавно выезжает */
         .tab-item.active .tab-label {
             max-width: 100px; 
             opacity: 1;
         }
 
-        /* Активная иконка: заливается цветом внутри, обводка пропадает */
         .tab-item.active .tab-icon svg {
             fill: currentColor;
             stroke: none;
         }
+        /* --- КОНЕЦ МЕНЮ --- */
 
         .container {
             padding: 20px;
@@ -224,7 +221,7 @@
             transition: all 0.2s; 
         }
 
-       /* --- Стили для инструкции Karing --- */
+        /* --- Стили для инструкции Karing --- */
         .btn-secondary {
             background-color: #444;
             font-size: 14px;
@@ -260,7 +257,6 @@
             margin-top: 0;
         }
 
-        /* Добавляем отступы для списков, чтобы маркеры не прилипали к левому краю */
         .instruction-block ul {
             padding-left: 20px;
             margin-top: 5px;
@@ -268,23 +264,21 @@
 
         .instruction-block b { color: #fff; }
 
-        /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ (Планшеты и ПК) === */
+        /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ === */
         @media (min-width: 768px) {
-            /* 1. Центрируем контент и не даем ему расти больше 800px */
             .container {
-                max-width: 800px; /* Идеальная ширина для комфортного чтения */
-                margin: 0 auto;   /* Магия центрирования */
+                max-width: 800px;
+                margin: 0 auto; 
             }
 
-            /* 2. Собираем нижнее меню в центре, чтобы оно не растягивалось на 2 метра */
             #tabbar {
                 max-width: 800px;
-                height: 60px; /* Попытка сделать на компе меньше таб-бар */
                 left: 50%;
-                transform: translateX(-50%); /* Сдвигаем ровно по центру */
-                border-left: 1px solid #444; /* Рамки по бокам */
+                transform: translateX(-50%); 
+                border-left: 1px solid #444; 
                 border-right: 1px solid #444;
-                border-radius: 15px 15px 0 0; /* Скругляем верхние углы для стиля */
+                border-radius: 15px 15px 0 0; 
+                padding-bottom: 15px; /* На компе убираем отступ от "челки" айфона */
             }
         }
     </style>
