@@ -98,26 +98,25 @@
             box-sizing: border-box;
         }
 
-        /* --- НИЖНЕЕ МЕНЮ (ПОЛНОСТЬЮ ПЕРЕПИСАННОЕ) --- */
+        /* --- НИЖНЕЕ МЕНЮ (САМОЕ БЕЗОПАСНОЕ ДЛЯ iOS 15) --- */
         #tabbar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            /* ИДЕАЛЬНАЯ ФОРМУЛА ДЛЯ iPHONE: 70px под кнопки + место под челку */
-            height: calc(70px + env(safe-area-inset-bottom)); 
-            padding-bottom: env(safe-area-inset-bottom); 
-            background: rgba(40, 42, 44, 0.85); /* Полупрозрачный фон */
+            /* Добавляем , 0px как страховку, чтобы calc не сломался */
+            height: calc(70px + env(safe-area-inset-bottom, 0px)); 
+            padding-bottom: env(safe-area-inset-bottom, 0px); 
+            background: rgba(40, 42, 44, 0.85); 
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: none;
-            flex-direction: row; /* Иконки строго в строку */
+            flex-direction: row; 
             justify-content: center; 
-            gap: 20px; 
-            align-items: center; /* Центрируем иконки внутри 70px */
+            align-items: center; 
             border-top: 1px solid #444;
             z-index: 100;
-            box-sizing: border-box; /* Чтобы padding не раздувал высоту */
+            box-sizing: border-box; 
         }
 
         .tab-item {
@@ -129,17 +128,20 @@
             justify-content: center;
             padding: 12px;
             border-radius: 100px; 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            gap: 0; 
-            outline: none; /* Защита от системных обводок */
+            transition: all 0.4s ease;
+            outline: none; 
+            flex-wrap: nowrap; /* Жестко запрещаем перенос на новую строку */
+            margin: 0 10px; /* Безопасная замена gap для старых Safari */
         }
 
         .tab-icon {
             width: 24px;
             height: 24px;
+            min-width: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0; /* Запрещаем иконке сжиматься */
         }
 
         .tab-icon svg {
@@ -157,20 +159,25 @@
             max-width: 0; 
             opacity: 0;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s ease;
             white-space: nowrap;
+            display: inline-block;
+            margin-left: 0; /* Изначально отступа нет */
         }
 
         .tab-item.active {
+            /* Фоллбэк для старых iOS: цвет #3b82f6 с 15% прозрачностью */
+            background-color: rgba(59, 130, 246, 0.15); 
+            /* Для новых браузеров: */
             background-color: color-mix(in srgb, var(--accent) 15%, transparent);
             color: var(--accent); 
             padding: 12px 20px; 
-            gap: 8px; 
         }
 
         .tab-item.active .tab-label {
             max-width: 100px; 
             opacity: 1;
+            margin-left: 8px; /* Безопасная замена gap */
         }
 
         .tab-item.active .tab-icon svg {
