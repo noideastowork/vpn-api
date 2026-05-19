@@ -33,6 +33,7 @@
             flex-direction: column;
             height: 100dvh; 
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent; /* УБИРАЕМ МИГАНИЕ НА ANDROID ВО ВСЕМ ПРИЛОЖЕНИИ */
         }
 
         .screen {
@@ -41,7 +42,7 @@
             height: 100%;
             width: 100%;
             overflow-y: auto;
-            padding-bottom: 100px; /* Сделал отступ чуть больше из-за нового таббара */
+            padding-bottom: 120px; /* Отступ с запасом, чтобы меню не перекрывало нижний текст */
             box-sizing: border-box;
         }
 
@@ -97,39 +98,40 @@
             box-sizing: border-box;
         }
 
-        /* --- НИЖНЕЕ МЕНЮ (НОВОЕ, С ЗАЩИТОЙ ПОД IPHONE) --- */
+        /* --- НИЖНЕЕ МЕНЮ (ПОЛНОСТЬЮ ПЕРЕПИСАННОЕ) --- */
         #tabbar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            /* Убрали жесткий height: 80px, теперь высота гибкая */
-            padding-top: 15px;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* env(...) дает отступ ровно на высоту полоски Айфона */
-            background: #282a2cc4;
+            /* ИДЕАЛЬНАЯ ФОРМУЛА ДЛЯ iPHONE: 70px под кнопки + место под челку */
+            height: calc(70px + env(safe-area-inset-bottom)); 
+            padding-bottom: env(safe-area-inset-bottom); 
+            background: rgba(40, 42, 44, 0.85); /* Полупрозрачный фон */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             display: none;
-            flex-direction: row;
+            flex-direction: row; /* Иконки строго в строку */
             justify-content: center; 
             gap: 20px; 
-            align-items: center;
+            align-items: center; /* Центрируем иконки внутри 70px */
             border-top: 1px solid #444;
             z-index: 100;
-            box-sizing: border-box;
+            box-sizing: border-box; /* Чтобы padding не раздувал высоту */
         }
 
         .tab-item {
             color: var(--text-secondary);
             text-decoration: none;
             display: flex;
-            flex-direction: row; /* Жестко в строку, чтобы текст был сбоку */
+            flex-direction: row; 
             align-items: center;
             justify-content: center;
             padding: 12px;
             border-radius: 100px; 
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 0; 
+            outline: none; /* Защита от системных обводок */
         }
 
         .tab-icon {
@@ -205,6 +207,7 @@
             cursor: pointer;
             width: 100%;
             transition: all 0.2s; 
+            outline: none;
         }
 
         .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 60px;}
@@ -278,7 +281,10 @@
                 border-left: 1px solid #444; 
                 border-right: 1px solid #444;
                 border-radius: 15px 15px 0 0; 
-                padding-bottom: 15px; /* На компе убираем отступ от "челки" айфона */
+                
+                /* ДЕСКТОП: Жесткая высота 60px, отключаем отступ от "челки" айфона */
+                height: 60px; 
+                padding-bottom: 0; 
             }
         }
     </style>
