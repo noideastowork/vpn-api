@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Bukvi</title>
     
     <link rel="manifest" href="manifest.json">
@@ -22,23 +22,16 @@
             --accent: #3b82f6; 
             --danger: #ef4444;
         }
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            min-height: 100vh;
-            min-height: 100dvh;
             color: var(--text-main);
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
+            height: 100dvh; 
             overflow: hidden;
             -webkit-tap-highlight-color: transparent; /* УБИРАЕМ МИГАНИЕ НА ANDROID ВО ВСЕМ ПРИЛОЖЕНИИ */
         }
@@ -46,11 +39,10 @@
         .screen {
             display: none;
             flex-direction: column;
-            flex: 1;
-            min-height: 0;
+            height: 100%;
             width: 100%;
             overflow-y: auto;
-            padding-bottom: calc(90px + env(safe-area-inset-bottom));
+            padding-bottom: 120px; /* Отступ с запасом, чтобы меню не перекрывало нижний текст */
             box-sizing: border-box;
         }
 
@@ -108,36 +100,28 @@
 
         /* --- НИЖНЕЕ МЕНЮ (ПОЛНОСТЬЮ ПЕРЕПИСАННОЕ) --- */
         #tabbar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-
-    height: calc(70px + env(safe-area-inset-bottom));
-    padding-bottom: env(safe-area-inset-bottom);
-
-    background: rgba(40, 42, 44, 0.85);
-
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-
-    display: none;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-
-    gap: 20px;
-
-    border-top: 1px solid #444;
-
-    z-index: 100;
-    box-sizing: border-box;
-}
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            /* ИДЕАЛЬНАЯ ФОРМУЛА ДЛЯ iPHONE: 70px под кнопки + место под челку */
+            height: calc(70px + env(safe-area-inset-bottom)); 
+            padding-bottom: env(safe-area-inset-bottom); 
+            background: rgba(40, 42, 44, 0.85); /* Полупрозрачный фон */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            flex-direction: row; /* Иконки строго в строку */
+            justify-content: center; 
+            gap: 20px; 
+            align-items: center; /* Центрируем иконки внутри 70px */
+            border-top: 1px solid #444;
+            z-index: 100;
+            box-sizing: border-box; /* Чтобы padding не раздувал высоту */
+        }
 
         .tab-item {
             color: var(--text-secondary);
-            min-width: 56px;
-            min-height: 48px;
             text-decoration: none;
             display: flex;
             flex-direction: row; 
@@ -302,12 +286,6 @@
                 height: 60px; 
                 padding-bottom: 0; 
             }
-           
-            #app-content {
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-            }
         }
     </style>
 </head>
@@ -345,7 +323,7 @@
         <div id="login-msg" style="margin-top:15px; color: var(--text-secondary); text-align: center;"></div>
     </div>
 
-    <div id="app-content">
+    <div id="app-content" style="display:none; height:100%;">
         
         <div id="tab-news" class="tab-content screen active">
             <div class="container">
@@ -1010,7 +988,7 @@
         function showApp() {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('screen-loading').style.display = 'none';
-            document.getElementById('app-content').style.display = 'flex';
+            document.getElementById('app-content').style.display = 'block';
             document.getElementById('tabbar').style.display = 'flex';
             switchTab('news');
         }
