@@ -100,38 +100,84 @@
             box-sizing: border-box;
         }
 
+/* --- НИЖНЕЕ МЕНЮ --- */
         #tabbar {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 70px;
+            height: 80px; /* Чуть выше для удобства пальца */
             background: #282a2cc4;
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             display: none;
-            justify-content: space-around;
+            justify-content: center; /* Собираем элементы в центре */
+            gap: 20px; /* Расстояние между вкладками */
             align-items: center;
             border-top: 1px solid #444;
             z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom); /* Защита от полоски на iPhone */
         }
 
         .tab-item {
             color: var(--text-secondary);
-            text-align: center;
-            font-size: 12px;
             text-decoration: none;
             display: flex;
-            flex-direction: column;
             align-items: center;
-        }
-
-        .tab-item.active {
-            color: var(--accent);
+            justify-content: center;
+            padding: 12px;
+            border-radius: 100px; /* Форма капсулы */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 0; /* Изначально отступа нет, текст скрыт */
         }
 
         .tab-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Неактивная иконка: только обводка (line-art) */
+        .tab-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            transition: all 0.3s ease;
+        }
+
+        .tab-label {
+            font-size: 14px;
+            font-weight: 600;
+            max-width: 0; /* Прячем текст нулевой шириной */
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+        }
+
+        /* --- АКТИВНОЕ СОСТОЯНИЕ --- */
+        .tab-item.active {
+            /* color-mix делает фон на 15% прозрачным от вашего цвета --accent */
+            background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+            color: var(--accent); /* Красим текст и иконку */
+            padding: 12px 20px; /* Расширяем плашку */
+            gap: 8px; /* Появляется отступ между иконкой и текстом */
+        }
+
+        /* Текст плавно выезжает */
+        .tab-item.active .tab-label {
+            max-width: 100px; 
+            opacity: 1;
+        }
+
+        /* Активная иконка: заливается цветом внутри, обводка пропадает */
+        .tab-item.active .tab-icon svg {
+            fill: currentColor;
+            stroke: none;
         }
 
         .container {
@@ -636,16 +682,25 @@
         </div>
 
         <div id="tabbar">
-            <a href="#" class="tab-item active" onclick="switchTab('news')">
-                <div class="tab-icon">📰</div>
-                Новости
-            </a>
-            <a href="#" class="tab-item" onclick="switchTab('profile')">
-                <div class="tab-icon">👤</div>
-                Профиль
-            </a>
-        </div>
-    </div>
+                    <a href="#" class="tab-item active" onclick="switchTab('news')">
+                        <div class="tab-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </div>
+                        <span class="tab-label">Новости</span>
+                    </a>
+                    <a href="#" class="tab-item" onclick="switchTab('profile')">
+                        <div class="tab-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke-linecap="round" stroke-linejoin="round"></path>
+                                <circle cx="12" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round"></circle>
+                            </svg>
+                        </div>
+                        <span class="tab-label">Профиль</span>
+                    </a>
+                </div>
+            </div>
 
    <script>
         // --- КОНФИГУРАЦИЯ ---
