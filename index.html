@@ -97,51 +97,57 @@
             box-sizing: border-box;
         }
 
-        /* --- НИЖНЕЕ МЕНЮ (САМОЕ БЕЗОПАСНОЕ ДЛЯ iOS 15) --- */
+        /* --- ОТРЫВНОЙ ПАРЯЩИЙ ТАББАР (РЕШЕНИЕ ДЛЯ iOS 18) --- */
         #tabbar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            /* Убираем height, используем только padding */
-            padding-top: 15px;
-            /* Отступ снизу = 15px + высота системной полоски Айфона (или 20px, если не сработает) */
-            padding-bottom: calc(15px + env(safe-area-inset-bottom, 20px)); 
+            /* Сдвигаем плашку чуть выше системной полоски */
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px)); 
+            left: 50%;
+            transform: translateX(-50%); /* Центрируем по экрану */
+            width: calc(100% - 32px); /* Делаем небольшие отступы по бокам */
+            max-width: 400px; /* Чтобы на больших экранах он не растягивался */
+            height: 64px; /* Фиксированная аккуратная высота */
+            
+            /* Делаем полностью круглую лаконичную капсулу */
+            border-radius: 100px; 
             background: rgba(40, 42, 44, 0.85); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            
             display: none;
-            flex-direction: row; 
-            justify-content: center; 
-            align-items: center; 
-            border-top: 1px solid #444;
+            flex-direction: row;
+            justify-content: space-around; 
+            align-items: center;
+            
+            /* Мягкая премиальная тень, чтобы отделить меню от текста новостей */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.08); /* Едва заметная неоновая обводка */
             z-index: 100;
-            box-sizing: border-box; 
+            box-sizing: border-box;
+            padding: 0 10px;
         }
 
         .tab-item {
             color: var(--text-secondary);
             text-decoration: none;
             display: flex;
-            flex-direction: row; 
+            flex-direction: row;
             align-items: center;
             justify-content: center;
-            padding: 12px;
+            height: 44px; /* Ограничиваем высоту внутренней кнопки */
             border-radius: 100px; 
-            transition: all 0.4s ease;
-            outline: none; 
-            flex-wrap: nowrap; /* Жестко запрещаем перенос на новую строку */
-            margin: 0 10px; /* Безопасная замена gap для старых Safari */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            gap: 0;
+            -webkit-user-select: none; /* Убираем выделение текста при долгом нажатии */
+            user-select: none;
         }
 
         .tab-icon {
             width: 24px;
             height: 24px;
-            min-width: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0; /* Запрещаем иконке сжиматься */
         }
 
         .tab-icon svg {
@@ -150,7 +156,7 @@
             stroke: currentColor;
             stroke-width: 2;
             fill: none;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
         }
 
         .tab-label {
@@ -159,25 +165,21 @@
             max-width: 0; 
             opacity: 0;
             overflow: hidden;
-            transition: all 0.4s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
-            display: inline-block;
-            margin-left: 0; /* Изначально отступа нет */
         }
 
+        /* --- АКТИВНОЕ СОСТОЯНИЕ (ВНУТРИ КАПСУЛЫ) --- */
         .tab-item.active {
-            /* Фоллбэк для старых iOS: цвет #3b82f6 с 15% прозрачностью */
-            background-color: rgba(59, 130, 246, 0.15); 
-            /* Для новых браузеров: */
             background-color: color-mix(in srgb, var(--accent) 15%, transparent);
             color: var(--accent); 
-            padding: 12px 20px; 
+            padding: 0 16px; 
+            gap: 8px; 
         }
 
         .tab-item.active .tab-label {
             max-width: 100px; 
             opacity: 1;
-            margin-left: 8px; /* Безопасная замена gap */
         }
 
         .tab-item.active .tab-icon svg {
@@ -282,17 +284,12 @@
             }
 
             #tabbar {
-                max-width: 800px;
+                max-width: 400px; /* Оставляем его аккуратной мобильной капсулой по центру экрана */
                 left: 50%;
-                transform: translateX(-50%); 
-                border-left: 1px solid #444; 
-                border-right: 1px solid #444;
-                border-radius: 15px 15px 0 0; 
-                
-                /* ДЕСКТОП: Жесткая высота, отключаем отступ от полоски айфона */
-                padding-top: 0;
-                padding-bottom: 0; 
-                height: 60px; 
+                transform: translateX(-50%);
+                bottom: 20px; /* Фиксированный отступ на компьютерах */
+                height: 60px;
+                border-radius: 100px;
             }
         }
     </style>
