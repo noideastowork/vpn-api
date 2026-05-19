@@ -108,9 +108,9 @@
             max-width: 400px; /* Чтобы на больших экранах он не растягивался */
             height: 64px; /* Фиксированная аккуратная высота */
             
-            /* Делаем полностью круглую лаконичную капсулу */
-            border-radius: 100px; 
-            background: rgba(40, 42, 44, 0.85); 
+            /* Делаем полностью круглую лаконичную капсулу. Нет не делаем */
+            border-radius: 15px; 
+            background: rgb(40 42 44 / 52%); 
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             
@@ -284,12 +284,12 @@
             }
 
             #tabbar {
-                max-width: 400px; /* Оставляем его аккуратной мобильной капсулой по центру экрана */
+                max-width: 800px; /* Оставляем его аккуратной мобильной капсулой по центру экрана */
                 left: 50%;
                 transform: translateX(-50%);
                 bottom: 20px; /* Фиксированный отступ на компьютерах */
                 height: 60px;
-                border-radius: 100px;
+                border-radius: 15px;
             }
         }
     </style>
