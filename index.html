@@ -2,9 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">    
     <title>Bukvi</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1a1a1a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -104,9 +103,10 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            /* Добавляем , 0px как страховку, чтобы calc не сломался */
-            height: calc(70px + env(safe-area-inset-bottom, 0px)); 
-            padding-bottom: env(safe-area-inset-bottom, 0px); 
+            /* Убираем height, используем только padding */
+            padding-top: 15px;
+            /* Отступ снизу = 15px + высота системной полоски Айфона (или 20px, если не сработает) */
+            padding-bottom: calc(15px + env(safe-area-inset-bottom, 20px)); 
             background: rgba(40, 42, 44, 0.85); 
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -289,9 +289,10 @@
                 border-right: 1px solid #444;
                 border-radius: 15px 15px 0 0; 
                 
-                /* ДЕСКТОП: Жесткая высота 60px, отключаем отступ от "челки" айфона */
-                height: 60px; 
+                /* ДЕСКТОП: Жесткая высота, отключаем отступ от полоски айфона */
+                padding-top: 0;
                 padding-bottom: 0; 
+                height: 60px; 
             }
         }
     </style>
