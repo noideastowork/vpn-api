@@ -234,7 +234,7 @@ color: var(--text-secondary);
             outline: none;
         }
 
-        .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 60px;}
+        .btn-danger { background-color: var(--danger); margin-top: 20px; margin-bottom: 0;}
 
         .copy-box {
             background: #111;
@@ -702,6 +702,7 @@ color: var(--text-secondary);
                 </div>
 
                 <button class="btn btn-danger" onclick="handleLogout()">Выйти из аккаунта</button>
+                <button class="btn btn-secondary" style="margin-bottom: 60px;" onclick="handleHardReset()"> [Системное] Сбросить кэш, если что-то не работает</button>
             </div>
         </div>
 
@@ -1020,6 +1021,23 @@ color: var(--text-secondary);
             document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
             const activeBtn = document.querySelector(`.tab-item[onclick="switchTab('${tabId}')"]`);
             if(activeBtn) activeBtn.classList.add('active');
+        }
+
+       // Принудительное уничтожение кэша и жесткая перезагрузка
+        async function handleHardReset() {
+            // 1. Вычищаем Cache Storage самого приложения
+            if ('caches' in window) {
+                try {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(key => caches.delete(key)));
+                } catch (e) {
+                    console.error('Ошибка очистки Cache Storage:', e);
+                }
+            }
+            
+            // 2. Перенаправляем на страницу с уникальным timestamp-параметром.
+            // Это заставит браузер и DPI провайдера пробить свой кэш и скачать чистый код с сервера.
+            window.location.href = window.location.pathname + '?u=' + Date.now();
         }
 
         window.onload = initApp;
