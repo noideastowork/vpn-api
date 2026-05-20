@@ -128,31 +128,33 @@
         }
 
         .tab-item {
-            color: var(--text-secondary);
+color: var(--text-secondary);
             text-decoration: none;
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            height: 44px; /* Ограничиваем высоту внутренней кнопки */
+            height: 44px; /* Визуальная высота остается прежней */
             border-radius: 100px; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 0;
-            -webkit-user-select: none; /* Убираем выделение текста при долгом нажатии */
+            -webkit-user-select: none; 
             user-select: none;
+            
+            /* ЭТО ВАЖНО: Делаем кнопку "точкой отсчета" для невидимой зоны */
+            position: relative;
         }
 
-        /* МАНЕВР ДЛЯ УВЕЛИЧЕНИЯ ЗОНЫ КЛИКА */
+        /* --- МАГИЯ: НЕВИДИМЫЙ ХИТБОКС --- */
         .tab-item::after {
             content: '';
             position: absolute;
-            /* Расширяем невидимую зону вверх и вниз до краев таббара */
-            top: -10px;
-            bottom: -10px;
-            /* Расширяем зону влево и вправо, закрывая пустые зазоры */
-            left: -45px;
-            right: -45px;
-            /* background: rgba(255, 0, 0, 0.3); */ /* <-- Раскомментируйте эту строку для теста, чтобы увидеть невидимую зону своими глазами (она подсветится красным) */
+            /* Растягиваем невидимую зону клика во все стороны */
+            top: -10px;    
+            bottom: -10px; 
+            left: -25px;   
+            right: -25px;  
+            z-index: 1; /* Чтобы перекрывать пустое пространство */
         }
 
         .tab-icon {
