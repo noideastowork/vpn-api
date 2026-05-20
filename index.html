@@ -320,6 +320,65 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        /* --- СТИЛЬНЫЕ ТРЕХУРОВНЕВЫЕ ШАПКИ КАРТОЧЕК --- */
+        .card-header-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        /* Уровень 1: Тип/Важность подключения (Супер-скругленный бейдж) */
+        .status-badge {
+            display: inline-flex;
+            align-self: flex-start; /* Чтобы бейдж не растягивался на весь экран */
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 4px 10px;
+            border-radius: 100px;
+        }
+        /* Цвета для разных уровней резерва */
+        .status-badge.primary {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+        }
+        .status-badge.backup {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+        .status-badge.max-backup {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Уровень 2: Название (Перебиваем старые маргины заголовка) */
+        .card .card-header-block .news-title {
+            margin: 0 !important;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        /* Уровень 3: Контейнер для круглых серых плашек платформ */
+        .platform-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .platform-tag {
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.06); /* Мягкий серый фон */
+            color: #aaa; /* Серый текст */
+            padding: 4px 10px;
+            border-radius: 100px; /* Максимально круглые лейблы */
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
         /* Красивое бесконечное вращение иконки */
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -402,21 +461,29 @@
         <div id="tab-profile" class="tab-content screen">
             <div class="container">
                 <h1>Профиль</h1>
+                
                 <div class="card">
-                    <div class="news-title">Базовые ссылки-подписки (VLESS, Trojan, Hysteria или SS). Все платформы: Windows, iOS, Android, Android TV, MacOS</div>
-                    <div class="news-date">Используйте в первую очередь. Все протоколы продублированы на двух серверах. Нажмите на ключ, чтобы скопировать его.</div>
+                    <div class="card-header-block">
+                        <span class="status-badge primary">Основное подключение</span>
+                        <div class="news-title">Ссылки-подписки (VLESS, Trojan, Hysteria, SS)</div>
+                        <div class="platform-list">
+                            <span class="platform-tag">Windows</span>
+                            <span class="platform-tag">iOS</span>
+                            <span class="platform-tag">Android</span>
+                            <span class="platform-tag">Android TV</span>
+                            <span class="platform-tag">macOS</span>
+                        </div>
+                    </div>
+                    <div class="news-date">Все протоколы продублированы на двух серверах. Нажмите на ключ ниже, чтобы скопировать.</div>
                     <div id="raw-links-container">Загрузка ключей...</div>
 
-                    <!-- Кнопка для открытия инструкции -->
                     <button class="btn btn-secondary" onclick="toggleKaring()">📖 Инструкция для Karing</button>
                     
-                    <!-- Скрытый блок инструкции -->
                     <div id="karing-instruction" class="instruction-block">
                         <h3>Шаг 1. Установка</h3>
                         <ul>
                             <li><b>iOS:</b> Установите напрямую из App Store.</li>
                             <li><b>Android, Windows, macOS:</b> Скачайте актуальную версию со страницы релизов GitHub - <a href="https://github.com/KaringX/karing/releases/latest" target="_blank" style="color: var(--accent);">ссылка</a>
-                                <!-- Вложенный список второго уровня -->
                                 <ul style="margin-top: 5px; margin-bottom: 5px; padding-left: 20px;">
                                     <li><b>Android:</b> файл android_arm.apk</li>
                                     <li><b>Windows:</b> файл windows_x64.exe</li>
@@ -464,8 +531,16 @@
                 </div>
 
                 <div class="card" id="tt-card" style="display: none; border: 1px solid #10b981;">
-                    <div class="news-title">Резервный VPN (TrustTunnel). Только iOS, Android, MacOS</div>
-                    <div class="news-date">Используйте это приложение, если основные не работают.</div>
+                    <div class="card-header-block">
+                        <span class="status-badge backup">Резервное подключение</span>
+                        <div class="news-title">TrustTunnel VPN (Протокол Shadowsocks)</div>
+                        <div class="platform-list">
+                            <span class="platform-tag">iOS</span>
+                            <span class="platform-tag">Android</span>
+                            <span class="platform-tag">macOS</span>
+                        </div>
+                    </div>
+                    <div class="news-date">Используйте это приложение вручную, если основные ссылки-подписки попали под блокировку.</div>
                     
                     <div style="margin-top: 20px;">
                         <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Скачайте приложение TrustTunnel</h3>
@@ -694,10 +769,18 @@
                     </div>
                 </div>
             
-
                 <div class="card" id="naive-card" style="display: none; border: 1px solid #b9103f;">
-                    <div class="news-title">Еще один резервный VPN (Naive). <span style="color: #b9103f;">Beta</span></div>
-                    <div class="news-date">Это супер новый и мощный прокси-протокол, который маскируется под браузер Chrome. Один из самых устройчивых к блокировке. Он работает в Karing, но обычно немного медленнее привычных вариантов. И менее стабильно. Используйте, если ничего не работает.</div>
+                    <div class="card-header-block">
+                        <span class="status-badge max-backup">Самый крайний резерв</span>
+                        <div class="news-title">NaiveProxy (Маскировка под трафик Chrome)</div>
+                        <div class="platform-list">
+                            <span class="platform-tag">Windows</span>
+                            <span class="platform-tag">iOS</span>
+                            <span class="platform-tag">Android</span>
+                            <span class="platform-tag">macOS</span>
+                        </div>
+                    </div>
+                    <div class="news-date">Это супер устойчивый к блокировкам протокол. Он работает в Karing, но обычно немного медленнее привычных вариантов. Используйте, если ничего не работает.</div>
                     
                     <div style="margin-top: 20px;">
                         <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Обновите приложение Karing</h3>
@@ -744,7 +827,6 @@
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/blob/main/FAQ/Happ.md" style="color: #8dcaff;">Ссылка на текстовую инструкцию, как настроить Happ</a></p>
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Happ_video.mp4" style="color: #8dcaff;">Скачать видео-инструкцию, как настроить Happ</a></p>
                     <p style="color: var(--text-secondary);">Инструкция к Karing находится сверху <i>(в блоке "Базовые ссылки-подписки")</i></p>
-
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
                         <span style="color: var(--text-secondary); font-size: 14px;">Если вы не можете связаться со мной в Telegram, напишите на эту почту:</span><br>
                         <a href="#" id="admin-email-box" style="color: var(--accent); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Загрузка...</a>
