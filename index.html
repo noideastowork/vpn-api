@@ -776,16 +776,16 @@
                             <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">Bukvi TT v2 (HTTP)</div>
 
                             <span style="color: var(--text-secondary); font-size: 12px;">IP address</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-ip-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-ip-box2" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
 
                             <span style="color: var(--text-secondary); font-size: 12px;">Domain name</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-domain-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-domain-box2" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
 
                             <span style="color: var(--text-secondary); font-size: 12px;">Username</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-login-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-login-box2" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
                             
                             <span style="color: var(--text-secondary); font-size: 12px;">Password</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-password-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-password-box2" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
 
                             <span style="color: var(--text-secondary); font-size: 12px;">Protocol</span>
                             <div class="copy-box" style="margin-bottom: 15px;">Выберите <b>HTTP</b></div>
@@ -1091,6 +1091,12 @@
                         document.getElementById('tt-password-box').innerText = userData.tt_password;
                         document.getElementById('tt-ip-box').innerText = fetchedIp;
                         document.getElementById('tt-domain-box').innerText = fetchedDomain;
+
+                        // ДУБЛИРУЕМ ДАННЫЕ В ШАГ 4 (HTTP)
+                        document.getElementById('tt-login-box2').innerText = userData.username;
+                        document.getElementById('tt-password-box2').innerText = userData.tt_password;
+                        document.getElementById('tt-ip-box2').innerText = fetchedIp;
+                        document.getElementById('tt-domain-box2').innerText = fetchedDomain;
 
                         const naiveConfig = [{
                             "server": fetchedNaiveDomain,
