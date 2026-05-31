@@ -742,12 +742,12 @@
                         
                         <button class="btn" style="background: #333; font-size: 14px; padding: 10px; margin-bottom: 25px;" onclick="copyBypassList(this)">📋 Скопировать весь список</button>
                         
-                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавление сервера</h3>
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 3. Добавление сервера (QUIC)</h3>
                         <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Зайдите во вкладку <b>Servers</b> -> <b>Add server</b>/<b>Create</b> и нажимайте на поля ниже, чтобы скопировать и вставить нужные данные:</p>
                         
                         <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
                             <span style="color: var(--text-secondary); font-size: 12px;">Server name</span>
-                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">Bukvi TT v1</div>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">Bukvi TT v2 (QUIC)</div>
 
                             <span style="color: var(--text-secondary); font-size: 12px;">IP address</span>
                             <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-ip-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
@@ -759,14 +759,41 @@
                             <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-login-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
                             
                             <span style="color: var(--text-secondary); font-size: 12px;">Password</span>
-                            <div class="copy-box" style="cursor: pointer; color: #10b981;" id="tt-password-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-password-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
 
                             <span style="color: var(--text-secondary); font-size: 12px;">Protocol</span>
-                            <div class="copy-box" style="margin-bottom: 15px;">Выберите QUIC. <i>Если после подключения VPN не работает вернитесьи выберите HTTP</i></div>
+                            <div class="copy-box" style="margin-bottom: 15px;">Выберите QUIC></div>
                             
                             <span style="color: var(--text-secondary); font-size: 12px;">DNS server adresses...</span>
                             <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">8.8.8.8</div>
                         </div>
+
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 4. Добавление сервера (HTTP)</h3>
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Теперь добавим точно такой же сервер, как на 3 шаге, но в поле Protocol выберем HTTP. Для этого снова зайдите во вкладку <b>Servers</b> -> <b>Add server</b>/<b>Create</b> и нажимайте на поля ниже, чтобы скопировать и вставить нужные данные:</p>
+
+                        <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px;">
+                            <span style="color: var(--text-secondary); font-size: 12px;">Server name</span>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">Bukvi TT v2 (HTTP)</div>
+
+                            <span style="color: var(--text-secondary); font-size: 12px;">IP address</span>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-ip-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+
+                            <span style="color: var(--text-secondary); font-size: 12px;">Domain name</span>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent);" id="tt-domain-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+
+                            <span style="color: var(--text-secondary); font-size: 12px;">Username</span>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-login-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+                            
+                            <span style="color: var(--text-secondary); font-size: 12px;">Password</span>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: #10b981;" id="tt-password-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
+
+                            <span style="color: var(--text-secondary); font-size: 12px;">Protocol</span>
+                            <div class="copy-box" style="margin-bottom: 15px;">Выберите <b>HTTP</b></div>
+                            
+                            <span style="color: var(--text-secondary); font-size: 12px;">DNS server adresses...</span>
+                            <div class="copy-box" style="margin-bottom: 15px; cursor: pointer;" onclick="copyToClipboard(this.innerText.trim(), this)">8.8.8.8</div>
+                        </div>
+                        
                     </div>
                 </div>
             
