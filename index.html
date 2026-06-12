@@ -97,20 +97,19 @@
             box-sizing: border-box;
         }
 
-        /* --- ОТРЫВНОЙ ПАРЯЩИЙ ТАББАР (РЕШЕНИЕ ДЛЯ iOS 18) --- */
+        /* --- ОТРЫВНОЙ ПАРЯЩИЙ ТАББАР (ФИКС ВЫСОТЫ iPHONE И ХИТБОКСА) --- */
         #tabbar {
             position: fixed;
-            /* Сдвигаем плашку чуть выше системной полоски */
-            bottom: calc(8px + env(safe-area-inset-bottom, 0px)); 
+            /* Стабильный отступ снизу без сильного разброса от env() */
+            bottom: calc(10px + env(safe-area-inset-bottom, 0px) * 0.5); 
             left: 50%;
-            transform: translateX(-50%); /* Центрируем по экрану */
-            width: calc(100% - 15px); /* Делаем небольшие отступы по бокам */
-            max-width: 400px; /* Чтобы на больших экранах он не растягивался */
-            height: 64px; /* Фиксированная аккуратная высота */
+            transform: translateX(-50%); 
+            width: calc(100% - 24px); /* Чуть увеличили ширину для баланса */
+            max-width: 400px; 
+            height: 64px; 
             
-            /* Делаем полностью круглую лаконичную капсулу. Нет не делаем */
-            border-radius: 15px; 
-            background: rgb(40 42 44 / 52%); 
+            border-radius: 16px; 
+            background: rgba(40, 42, 44, 0.75); /* Оптимальная прозрачность */
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             
@@ -119,12 +118,11 @@
             justify-content: space-around; 
             align-items: center;
             
-            /* Мягкая премиальная тень, чтобы отделить меню от текста новостей */
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.08); /* Едва заметная неоновая обводка */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
             z-index: 100;
             box-sizing: border-box;
-            padding: 0 10px;
+            padding: 0 8px;
         }
 
         .tab-item {
@@ -134,27 +132,24 @@
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            height: 44px; /* Визуальная высота остается прежней */
-            border-radius: 100px; 
+            height: 48px; /* Чуть увеличили высоту самой кнопки */
+            border-radius: 12px; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 0;
             -webkit-user-select: none; 
             user-select: none;
-            
-            /* ЭТО ВАЖНО: Делаем кнопку "точкой отсчета" для невидимой зоны */
-            position: relative;
+            position: relative; /* База для хитбокса */
         }
 
-        /* --- МАГИЯ: НЕВИДИМЫЙ ХИТБОКС --- */
+        /* УВЕЛИЧЕННЫЙ ХИТБОКС: кликабельная зона теперь выходит за рамки иконки */
         .tab-item::after {
             content: '';
             position: absolute;
-            /* Растягиваем невидимую зону клика во все стороны */
-            top: -10px;    
-            bottom: -10px; 
-            left: -45px;   
-            right: -45px;  
-            z-index: 1; /* Чтобы перекрывать пустое пространство */
+            top: -8px;
+            bottom: -8px;
+            left: -20px;
+            right: -20px;
+            z-index: 1;
         }
 
         .tab-icon {
@@ -163,6 +158,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            z-index: 2; /* Поверх хитбокса */
         }
 
         .tab-icon svg {
@@ -182,9 +179,11 @@
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
+            position: relative;
+            z-index: 2;
         }
 
-        /* --- АКТИВНОЕ СОСТОЯНИЕ (ВНУТРИ КАПСУЛЫ) --- */
+        /* --- АКТИВНОЕ СОСТОЯНИЕ --- */
         .tab-item.active {
             background-color: color-mix(in srgb, var(--accent) 15%, transparent);
             color: var(--accent); 
