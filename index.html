@@ -411,6 +411,49 @@
             animation: gradientShift 7s ease-in-out infinite;
         }
 
+        /* --- СТИЛЬНОЕ ОГЛАВЛЕНИЕ (QUICK NAV) --- */
+        .nav-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 8px 0; /* Делаем внутренние отступы только сверху и снизу */
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .nav-item:not(:last-child) {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04); /* Тонкая премиальная линия разделения */
+        }
+
+        .nav-item:active {
+            background: rgba(255, 255, 255, 0.04); /* Мягкий отклик на нажатие */
+        }
+
+        .nav-arrow {
+            color: var(--text-secondary);
+            opacity: 0.4;
+            font-weight: 400;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        
+        .nav-item:active .nav-arrow {
+            transform: translateX(3px); /* Стрелочка слегка сдвигается при клике */
+            opacity: 0.8;
+        }
+
         /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ === */
         @media (min-width: 768px) {
             .container {
@@ -494,6 +537,27 @@
                     </div>
                     <span style="font-weight: 600;">Принудительно обновить приложение и его кэш</span>
                 </button>
+
+                <div class="nav-card">
+                    <a href="#" class="nav-item" onclick="scrollToBlock('main-card'); return false;">
+                        <span>Ссылки-подписки (основные)</span>
+                        <span class="nav-arrow">→</span>
+                    </a>
+                    <a href="#" class="nav-item" id="nav-link-tt" style="display: none;" onclick="scrollToBlock('tt-card'); return false;">
+                        <span>TrustTunnel VPN (резерв)</span>
+                        <span class="nav-arrow">→</span>
+                    </a>
+                    <a href="#" class="nav-item" id="nav-link-naive" style="display: none;" onclick="scrollToBlock('naive-card'); return false;">
+                        <span>NaiveProxy (крайний резерв)</span>
+                        <span class="nav-arrow">→</span>
+                    </a>
+                    <a href="#" class="nav-item" onclick="scrollToBlock('faq-card'); return false;">
+                        <span>FAQ / Инструкции</span>
+                        <span class="nav-arrow">→</span>
+                    </a>
+                </div>
+
+                <div class="card" id="main-card" style="border: 1px solid #3b82f6;">
 
                 <div class="card" style="border: 1px solid #3b82f6;">
                     <div class="card-header-block">
@@ -884,8 +948,8 @@
                     <button class="btn" style="margin-top:10px;" onclick="copyToClipboard(document.getElementById('sub-link-box').innerText, this)">Скопировать ссылку</button>
                 </div>
 
-                <div class="card">
-                    <div class="news-title" style="border: 1px solid rgb(108 108 108);">FAQ / Инструкции</div>
+                <div class="card" id="faq-card" style="border: 1px solid rgb(108 108 108);">
+                    <div class="news-title">FAQ / Инструкции</div>
                     <p style="color: var(--text-secondary);"> <b>ВАЖНО:</b> Лучше использовать Karing, а не Happ</p>
                     <p style="color: var(--text-secondary);">
                         <a href="#" onclick="scrollToKaring(); return false;" style="color: #8dcaff; text-decoration: underline; font-weight: 600;"> Инструкция для Karing (сверху)</a>
@@ -1126,6 +1190,10 @@
                     if (userData.username && userData.tt_password) {
                         document.getElementById('tt-card').style.display = 'block';
                         document.getElementById('naive-card').style.display = 'block';
+
+                        // Показываем пункты в оглавлении, если карточки доступны юзеру
+                        document.getElementById('nav-link-tt').style.display = 'flex';
+                        document.getElementById('nav-link-naive').style.display = 'flex';
                         
                         document.getElementById('tt-login-box').innerText = userData.username;
                         document.getElementById('tt-password-box').innerText = userData.tt_password;
@@ -1276,6 +1344,14 @@
             // 2. Перенаправляем на страницу с уникальным timestamp-параметром.
             // Это заставит браузер и DPI провайдера пробить свой кэш и скачать чистый код с сервера.
             window.location.href = window.location.pathname + '?u=' + Date.now();
+        }
+
+       // Функция плавного перехода по оглавлению
+        function scrollToBlock(blockId) {
+            const el = document.getElementById(blockId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
         window.onload = initApp;
