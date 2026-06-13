@@ -510,7 +510,7 @@
                     <div class="news-date">Все протоколы продублированы на двух серверах. Нажмите на ключ ниже, чтобы скопировать.</div>
                     <div id="raw-links-container">Загрузка ключей...</div>
 
-                    <button class="btn btn-secondary" onclick="toggleKaring()">📖 Инструкция для Karing</button>
+                    <button id="karing-btn" class="btn btn-secondary" onclick="toggleKaring()">📖 Инструкция для Karing</button>
                     
                     <div id="karing-instruction" class="instruction-block">
                         <h3>Шаг 1. Установка</h3>
@@ -850,7 +850,8 @@
                     
                     <div style="margin-top: 20px;">
                         <h3 style="font-size: 14px; margin-bottom: 10px;">Шаг 1. Обновите приложение Karing</h3>
-                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;">Это обязательно, иначе протокол не заработает. Если Karing еще не настроен, то инструкция по установке Karing находится выше, в разделе Ссылки-подписки.</p>
+                        
+                        <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.4;"><a href="#" onclick="scrollToKaring(); return false;" style="color: #8dcaff; text-decoration: underline; font-weight: 600;"> Настройте Karing</a> и обновитесь. Это обязательно, иначе протокол не заработает. Если Karing еще не настроен, то инструкция по установке Karing находится выше, в разделе Ссылки-подписки.</p>
                         
                         <h3 style="font-size: 14px; margin-bottom: 10px; margin-top: 20px;">Шаг 2. Скопируйте ссылку</h3>
                         <div class="copy-box" style="margin-bottom: 15px; cursor: pointer; color: var(--accent); word-break: break-all;" id="naive-link-box" onclick="copyToClipboard(this.innerText.trim(), this)">Загрузка...</div>
@@ -886,7 +887,9 @@
                 <div class="card">
                     <div class="news-title">FAQ / Инструкции</div>
                     <p style="color: var(--text-secondary);"> <b>ВАЖНО:</b> Лучше использовать Karing, а не Happ</p>
-                    <p style="color: var(--text-secondary);">Инструкция к Karing находится сверху <i>(в блоке "Ссылки-подписки")</i></p>
+                    <p style="color: var(--text-secondary);">
+                        <a href="#" onclick="scrollToKaring(); return false;" style="color: #8dcaff; text-decoration: underline; font-weight: 600;"> Инструкция к Karing находится сверху (нажмите, чтобы открыть)</a>
+                    </p>
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/blob/main/FAQ/Happ.md" style="color: #8dcaff;">Ссылка на текстовую инструкцию, как настроить Happ</a></p>
                     <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Happ_video.mp4" style="color: #8dcaff;">Скачать видео-инструкцию, как настроить Happ</a></p>
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
@@ -1168,6 +1171,20 @@
         function toggleKaring() {
             const el = document.getElementById('karing-instruction');
             el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+       // Плавный скролл к инструкции и её автоматическое открытие
+        function scrollToKaring() {
+            const instructionBlock = document.getElementById('karing-instruction');
+            const karingBtn = document.getElementById('karing-btn');
+            
+            // 1. Если инструкция закрыта (display равен '' или 'none'), открываем её
+            if (instructionBlock.style.display !== 'block') {
+                toggleKaring();
+            }
+            
+            // 2. Плавно крутим страницу к кнопке инструкции
+            karingBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
        
         function copyBypassList(btnElement) {
