@@ -214,6 +214,7 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 15px;
+            scroll-margin-top: 20px;
         }
 
         .news-date { color: var(--text-secondary); font-size: 12px; margin-bottom: 5px; }
@@ -540,15 +541,15 @@
 
                 <div class="nav-card">
                     <a href="#" class="nav-item" onclick="scrollToBlock('main-card'); return false;">
-                        <span>Ссылки-подписки (основные)</span>
+                        <span>Ссылки-подписки</span>
                         <span class="nav-arrow">→</span>
                     </a>
                     <a href="#" class="nav-item" id="nav-link-tt" style="display: none;" onclick="scrollToBlock('tt-card'); return false;">
-                        <span>TrustTunnel VPN (резерв)</span>
+                        <span>TrustTunnel VPN</span>
                         <span class="nav-arrow">→</span>
                     </a>
                     <a href="#" class="nav-item" id="nav-link-naive" style="display: none;" onclick="scrollToBlock('naive-card'); return false;">
-                        <span>NaiveProxy (крайний резерв)</span>
+                        <span>NaiveProxy</span>
                         <span class="nav-arrow">→</span>
                     </a>
                     <a href="#" class="nav-item" onclick="scrollToBlock('faq-card'); return false;">
@@ -1348,7 +1349,7 @@
         function scrollToBlock(blockId) {
             const el = document.getElementById(blockId);
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
