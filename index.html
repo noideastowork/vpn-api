@@ -389,6 +389,30 @@
             animation: spin 0.8s linear infinite;
         }
 
+        /* --- КРАСИВЫЙ ГРАДИЕНТНЫЙ ПЕРЕЛИВ ИКОНКИ --- */
+        .animated-update-icon svg {
+            /* Базовый сочный голубой цвет */
+            color: #3b82f6; 
+            transition: filter 0.3s;
+        }
+
+        /* Бесконечная плавная анимация пульсации и смены оттенка (голубой -> бирюзовый) */
+        @keyframes gradientShift {
+            0%, 100% {
+                color: #3b82f6;
+                filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.4));
+            }
+            50% {
+                color: #06b6d4; /* Мягкий неоновый бирюзовый */
+                filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.7));
+            }
+        }
+
+        /* Запускаем строго раз в 7 секунд и делаем переход очень мягким */
+        .animated-update-icon svg {
+            animation: gradientShift 7s ease-in-out infinite;
+        }
+
         /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ === */
         @media (min-width: 768px) {
             .container {
@@ -461,7 +485,17 @@
         <div id="tab-profile" class="tab-content screen">
             <div class="container">
                 <h1>Профиль</h1>
-                <button class="btn btn-secondary" style="margin-bottom: 15px;" onclick="handleHardReset()">Принудительно обновить приложение и его кэш</button>
+                
+                <button class="btn btn-secondary" style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);" onclick="handleHardReset()">
+                    <div class="animated-update-icon" style="display: flex; align-items: center; justify-content: center;">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="7" x2="12" y2="16"></line>
+                            <polyline points="8 12 12 16 16 12"></polyline>
+                        </svg>
+                    </div>
+                    <span style="font-weight: 600;">Принудительно обновить приложение и его кэш</span>
+                </button>
 
                 <div class="card" style="border: 1px solid #3b82f6;">
                     <div class="card-header-block">
