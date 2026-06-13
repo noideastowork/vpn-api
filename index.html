@@ -1297,7 +1297,7 @@
             el.style.display = (el.style.display === 'block') ? 'none' : 'block';
         }
 
-       // Плавный скролл к инструкции и её автоматическое открытие
+        // Плавный скролл к инструкции и её автоматическое открытие (ОБНОВЛЕННАЯ ВЕРСИЯ)
         function scrollToKaring() {
             const instructionBlock = document.getElementById('karing-instruction');
             const karingBtn = document.getElementById('karing-btn');
@@ -1307,8 +1307,8 @@
                 toggleKaring();
             }
             
-            // 2. Плавно крутим страницу к кнопке инструкции
-            karingBtn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // 2. Плавно крутим страницу к кнопке инструкции, используя нашу новую надежную функцию
+            scrollToBlock('karing-btn');
         }
        
         function copyBypassList(btnElement) {
@@ -1412,11 +1412,35 @@
             window.location.href = window.location.pathname + '?u=' + Date.now();
         }
 
-       // Функция плавного перехода по оглавлению
+        // Функция плавного перехода по оглавлению (НОВАЯ, СТАБИЛЬНАЯ ВЕРСИЯ)
         function scrollToBlock(blockId) {
+            const container = document.getElementById('tab-profile');
             const el = document.getElementById(blockId);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+            if (container && el) {
+                const containerRect = container.getBoundingClientRect();
+                const elementRect = el.getBoundingClientRect();
+                
+                // Вычисляем позицию элемента относительно видимой области контейнера
+                const offset = elementRect.top - containerRect.top;
+                
+                // Вычисляем итоговую позицию для прокрутки (текущая прокрутка + смещение)
+                const targetScrollTop = container.scrollTop + offset;
+        
+                // Найдем родительскую карточку, чтобы учесть ее CSS-свойство scroll-margin-top
+                const cardParent = el.closest('.card, .nav-card');
+                let scrollMarginTop = 20; // Значение по умолчанию, если что-то пойдет не так
+                if (cardParent) {
+                    const style = window.getComputedStyle(cardParent);
+                    // Преобразуем значение из строки (например, "20px") в число
+                    scrollMarginTop = parseInt(style.scrollMarginTop, 10) || 0;
+                }
+        
+                // Выполняем плавную прокрутку к вычисленной позиции
+                container.scrollTo({
+                    top: targetScrollTop - scrollMarginTop,
+                    behavior: 'smooth'
+                });
             }
         }
 
