@@ -455,6 +455,46 @@
             opacity: 0.8;
         }
 
+        /* --- КНОПКА ВВЕРХ --- */
+        .scroll-top-btn {
+            position: fixed;
+            /* Размещаем над таббаром: 64px (высота таббара) + 10px (отступ таббара) + 16px (запас) */
+            bottom: calc(90px + env(safe-area-inset-bottom, 0px) * 0.5);
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(40, 42, 44, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--accent);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            z-index: 99;
+            
+            /* Изначально кнопка скрыта и прозрачна */
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Класс, который будет добавляться через JavaScript при скролле */
+        .scroll-top-btn.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        .scroll-top-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
         /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ === */
         @media (min-width: 768px) {
             .container {
@@ -962,6 +1002,14 @@
                 </div>
 
                 <button class="btn btn-danger" style="margin-bottom: 60px;" onclick="handleLogout()">Выйти из аккаунта</button>
+
+                <button id="to-top-btn" class="scroll-top-btn" onclick="scrollToTop('tab-profile')" title="Наверх">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
+                </button>
+                
             </div>
         </div>
 
@@ -1311,6 +1359,16 @@
             document.getElementById('app-content').style.display = 'block';
             document.getElementById('tabbar').style.display = 'flex';
             switchTab('news');
+
+            // ВКЛЮЧАЕМ СЛУШАТЕЛЬ СКРОЛЛА ДЛЯ КНОПКИ ВВЕРХ
+            document.getElementById('tab-profile').addEventListener('scroll', function() {
+                const topBtn = document.getElementById('to-top-btn');
+                if (this.scrollTop > 300) {
+                    topBtn.classList.add('visible');
+                } else {
+                    topBtn.classList.remove('visible');
+                }
+            });
         }
 
         function switchTab(tabId) {
@@ -1350,6 +1408,14 @@
             const el = document.getElementById(blockId);
             if (el) {
                 el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+       // Плавный скролл контейнера к самому началу
+        function scrollToTop(screenId) {
+            const screenEl = document.getElementById(screenId);
+            if (screenEl) {
+                screenEl.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
