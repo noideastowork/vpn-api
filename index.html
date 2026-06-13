@@ -240,7 +240,8 @@
             background-color: #f63b3b33;
             /* margin-top: 20px; */
             margin-bottom: 0;
-            border: 1px solid rgb(117 0 0);
+            /* border: 1px solid rgb(117 0 0); */
+            border: 1px solid rgb(108 33 33)
             /* border: 1px solid rgb(118 33 33); */
         }
 
@@ -1307,7 +1308,7 @@
             }
             
             // 2. Плавно крутим страницу к кнопке инструкции
-            karingBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            karingBtn.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
        
         function copyBypassList(btnElement) {
