@@ -32,7 +32,7 @@
             flex-direction: column;
             height: 100dvh; 
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent; /* УБИРАЕМ МИГАНИЕ НА ANDROID ВО ВСЕМ ПРИЛОЖЕНИИ */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .screen {
@@ -41,7 +41,7 @@
             height: 100%;
             width: 100%;
             overflow-y: auto;
-            padding-bottom: 120px; /* Отступ с запасом, чтобы меню не перекрывало нижний текст */
+            padding-bottom: 120px;
             box-sizing: border-box;
         }
 
@@ -97,19 +97,17 @@
             box-sizing: border-box;
         }
 
-        /* --- ОТРЫВНОЙ ПАРЯЩИЙ ТАББАР (ФИКС ВЫСОТЫ iPHONE И ХИТБОКСА) --- */
         #tabbar {
             position: fixed;
-            /* Стабильный отступ снизу без сильного разброса от env() */
             bottom: calc(10px + env(safe-area-inset-bottom, 0px) * 0.5); 
             left: 50%;
             transform: translateX(-50%); 
-            width: calc(100% - 24px); /* Чуть увеличили ширину для баланса */
+            width: calc(100% - 24px);
             max-width: 400px;  
             height: 64px; 
             
             border-radius: 16px; 
-            background: rgba(40, 42, 44, 0.75); /* Оптимальная прозрачность */
+            background: rgba(40, 42, 44, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             
@@ -132,16 +130,15 @@
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            height: 44px; /* Вернул назад в качестве текста */
-            border-radius: 48px;  /* Вернул назад в качестве текста */
+            height: 44px;
+            border-radius: 48px; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 0;
             -webkit-user-select: none; 
             user-select: none;
-            position: relative; /* База для хитбокса */
+            position: relative;
         }
 
-        /* УВЕЛИЧЕННЫЙ ХИТБОКС: кликабельная зона теперь выходит за рамки иконки */
         .tab-item::after {
             content: '';
             position: absolute;
@@ -159,7 +156,7 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            z-index: 2; /* Поверх хитбокса */
+            z-index: 2;
         }
 
         .tab-icon svg {
@@ -183,7 +180,6 @@
             z-index: 2;
         }
 
-        /* --- АКТИВНОЕ СОСТОЯНИЕ --- */
         .tab-item.active {
             background-color: color-mix(in srgb, var(--accent) 15%, transparent);
             color: var(--accent); 
@@ -200,7 +196,6 @@
             fill: currentColor;
             stroke: none;
         }
-        /* --- КОНЕЦ МЕНЮ --- */
 
         .container {
             padding: 50px 20px 20px 20px;
@@ -235,14 +230,9 @@
         }
 
         .btn-danger { 
-            /* background-color: var(--danger); */
-            /* background-color: #2e0808; */
             background-color: #f63b3b33;
-            /* margin-top: 20px; */
             margin-bottom: 0;
-            /* border: 1px solid rgb(117 0 0); */
             border: 1px solid rgb(98 36 36);
-            /* border: 1px solid rgb(118 33 33); */
         }
 
         .copy-box {
@@ -257,11 +247,19 @@
             transition: all 0.2s; 
         }
 
-        /* --- Стили для инструкции Karing --- */
         .btn-secondary {
             background-color: #444;
             font-size: 14px;
             margin-top: 15px;
+        }
+        
+        .buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .buttons-row .btn-secondary {
+            margin-top: 0;
         }
 
         .instruction-block {
@@ -300,7 +298,6 @@
 
         .instruction-block b { color: #fff; }
 
-        /* --- СТИЛЬНАЯ КНОПКА ОБНОВЛЕНИЯ --- */
         .refresh-heading-box {
             display: flex;
             justify-content: space-between;
@@ -329,7 +326,6 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- СТИЛЬНЫЕ ТРЕХУРОВНЕВЫЕ ШАПКИ КАРТОЧЕК --- */
         .card-header-block {
             display: flex;
             flex-direction: column;
@@ -337,10 +333,9 @@
             margin-bottom: 16px;
         }
 
-        /* Уровень 1: Тип/Важность подключения (Супер-скругленный бейдж) */
         .status-badge {
             display: inline-flex;
-            align-self: flex-start; /* Чтобы бейдж не растягивался на весь экран */
+            align-self: flex-start;
             font-size: 11px;
             font-weight: 700;
             text-transform: lowercase;
@@ -348,7 +343,7 @@
             padding: 4px 8px;
             border-radius: 7px;
         }
-        /* Цвета для разных уровней резерва */
+
         .status-badge.primary {
             background: rgba(59, 130, 246, 0.15);
             color: #3b82f6;
@@ -362,7 +357,6 @@
             color: #ff6fc2;
         }
 
-        /* Уровень 2: Название (Перебиваем старые маргины заголовка) */
         .card .card-header-block .news-title {
             margin: 0 !important;
             font-size: 22px;
@@ -371,7 +365,6 @@
             text-transform: uppercase;
         }
 
-        /* Уровень 3: Контейнер для круглых серых плашек платформ */
         .platform-list {
             display: flex;
             flex-wrap: wrap;
@@ -382,14 +375,13 @@
         .platform-tag {
             font-size: 9px;
             font-weight: 600;
-            background: rgba(255, 255, 255, 0.06); /* Мягкий серый фон */
-            color: #aaa; /* Серый текст */
+            background: rgba(255, 255, 255, 0.06);
+            color: #aaa;
             padding: 3px 4px;
-            border-radius: 6px; /* Максимально круглые лейблы */
+            border-radius: 6px;
             border: 1px solid rgba(255, 255, 255, 0.02);
         }
 
-        /* Красивое бесконечное вращение иконки */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -399,33 +391,21 @@
             animation: spin 0.8s linear infinite;
         }
 
-        /* --- КРАСИВЫЙ ГРАДИЕНТНЫЙ ПЕРЕЛИВ ИКОНКИ --- */
         .animated-update-icon svg {
-            /* Базовый сочный голубой цвет */
             color: #3b82f6; 
             transition: filter 0.3s;
-        }
-
-        /* Бесконечная плавная анимация пульсации и смены оттенка (белый -> серый) */
-        @keyframes gradientShift {
-            0%, 100% {
-                color: #989898;
-            }
-            50% {
-                color: #ffffff; /* Теперь белый */
-            }
-        }
-
-        /* Запускаем строго раз в 7 секунд и делаем переход очень мягким */
-        .animated-update-icon svg {
             animation: gradientShift 7s ease-in-out infinite;
         }
 
-        /* --- СТИЛЬНОЕ ОГЛАВЛЕНИЕ (QUICK NAV) --- */
+        @keyframes gradientShift {
+            0%, 100% { color: #989898; }
+            50% { color: #ffffff; }
+        }
+
         .nav-card {
             background: var(--card-bg);
             border-radius: 15px;
-            padding: 8px 0; /* Делаем внутренние отступы только сверху и снизу */
+            padding: 8px 0;
             margin-bottom: 15px;
             display: flex;
             flex-direction: column;
@@ -444,11 +424,11 @@
         }
 
         .nav-item:not(:last-child) {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04); /* Тонкая премиальная линия разделения */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .nav-item:active {
-            background: rgba(255, 255, 255, 0.04); /* Мягкий отклик на нажатие */
+            background: rgba(255, 255, 255, 0.04);
         }
 
         .nav-arrow {
@@ -460,14 +440,12 @@
         }
         
         .nav-item:active .nav-arrow {
-            transform: translateX(3px); /* Стрелочка слегка сдвигается при клике */
+            transform: translateX(3px);
             opacity: 0.8;
         }
 
-        /* --- КНОПКА ВВЕРХ --- */
         .scroll-top-btn {
             position: fixed;
-            /* Размещаем над таббаром: 64px (высота таббара) + 10px (отступ таббара) + 16px (запас) */
             bottom: calc(90px + env(safe-area-inset-bottom, 0px) * 0.5);
             right: 20px;
             width: 44px;
@@ -484,15 +462,12 @@
             cursor: pointer;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
             z-index: 99;
-            
-            /* Изначально кнопка скрыта и прозрачна */
             opacity: 0;
             pointer-events: none;
             transform: scale(0.8);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Класс, который будет добавляться через JavaScript при скролле */
         .scroll-top-btn.visible {
             opacity: 1;
             pointer-events: auto;
@@ -504,18 +479,16 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* === АДАПТИВ ДЛЯ БОЛЬШИХ ЭКРАНОВ === */
         @media (min-width: 768px) {
             .container {
                 max-width: 800px;
                 margin: 0 auto; 
             }
-
             #tabbar {
-                max-width: 840px; /* Нет. Оставляем его аккуратной мобильной капсулой по центру экрана */
+                max-width: 840px;
                 left: 50%;
                 transform: translateX(-50%);
-                bottom: 10px; /* Фиксированный отступ на компьютерах */
+                bottom: 10px;
                 height: 60px;
                 border-radius: 15px;
             }
@@ -623,8 +596,12 @@
                     <div class="news-date">Все протоколы продублированы на двух серверах. Нажмите на ключ ниже, чтобы скопировать.</div>
                     <div id="raw-links-container">Загрузка ключей...</div>
 
-                    <button id="karing-btn" class="btn btn-secondary" onclick="toggleKaring()">📖 Инструкция для Karing</button>
+                    <div class="buttons-row">
+                        <button id="karing-btn" class="btn btn-secondary" onclick="toggleKaring()">📖 Инструкция Karing</button>
+                        <button id="happ-btn" class="btn btn-secondary" onclick="toggleHapp()">📖 Инструкция Happ</button>
+                    </div>
                     
+                    <!-- ИНСТРУКЦИЯ KARING -->
                     <div id="karing-instruction" class="instruction-block">
                         <h3>Шаг 1. Установка</h3>
                         <ul>
@@ -691,6 +668,49 @@
                             <li>Затем откройте <a href="https://2ip.ru" target="_blank" style="color: var(--accent);" rel="noopener noreferrer">2ip.ru</a>. Страна должна отображаться как <strong>Россия</strong>. Если это не так, значит настройка выполнена некорректно. Вернитесь к <strong>Шагу 3</strong> и повторите настройку.</li>
                         </ul>
                     </div>
+
+                    <!-- ИНСТРУКЦИЯ HAPP -->
+                    <div id="happ-instruction" class="instruction-block">
+                        <h3>Шаг 0. Важно перед началом</h3>
+                        <p>Установите и <b>Karing</b>, и <b>Happ</b> — они работают на разных ядрах, поэтому в одном случае будет работать одно приложение, в другом другое.</p>
+
+                        <h3>Шаг 1. Скачайте приложение Happ</h3>
+                        <ul>
+                            <li><a href="https://apps.apple.com/us/app/happ-proxy-utility/id6504287215" target="_blank" style="color: var(--accent);">App Store для iOS</a></li>
+                            <li><a href="https://play.google.com/store/apps/details?id=com.happproxy" target="_blank" style="color: var(--accent);">Google Play для Android и Android TV</a></li>
+                            <li><a href="https://apps.apple.com/us/app/happ-proxy-utility/id6504287215" target="_blank" style="color: var(--accent);">App Store для macOS</a></li>
+                            <li><a href="https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe" target="_blank" style="color: var(--accent);">Установщик для Windows</a></li>
+                        </ul>
+
+                        <h3>Шаг 2. Настройка роутинга</h3>
+                        <p>Скопируйте текст ниже, зайдите в Happ, нажмите «+» в правом верхнем углу и выберите <b>«Вставить из буфера обмена»</b>:</p>
+                        <div class="copy-box" style="cursor: pointer; color: var(--accent); margin-top: 5px; margin-bottom: 5px; max-height: 120px; overflow-y: auto;" onclick="copyToClipboard(this.innerText.trim(), this)">
+                            happ://routing/add/eyJHbG9iYWxQcm94eSI6dHJ1ZSwiUHJveHlTaXRlcyI6W10sIkRvbWVzdGljRE5TVHlwZSI6IkRvSCIsIlByb3h5SXAiOltdLCJEb21lc3RpY0ROU0lwIjoiOC44LjguOCIsIlJlbW90ZUROU0RvbWFpbiI6Imh0dHBzOlwvXC9jbG91ZGZsYXJlLWRucy5jb21cL2Rucy1xdWVyeSIsIkRpcmVjdElwIjpbIjEwLjAuMC4wXC84IiwiMTAwLjY0LjAuMFwvMTAiLCIxNzIuMTYuMC4wXC8xMiIsIjE5Mi4xNjguMC4wXC8xNiIsIjE2OS4yNTQuMC4wXC8xNiIsIjIyNC4wLjAuMFwvNCIsIjI1NS4yNTUuMjU1LjI1NSJdLCJCbG9ja1NpdGVzIjpbXSwiQmxvY2tJcCI6W10sIkRvbWFpblN0cmF0ZWd5IjoiSVBJZk5vbk1hdGNoIiwiR2Vvc2l0ZVVybCI6Imh0dHBzOlwvXC9naXRodWIuY29tXC9Mb3lhbHNvbGRpZXJcL3YycmF5LXJ1bGVzLWRhdFwvcmVsZWFzZXNcL2xhdGVzdFwvZG93bmxvYWRcL2dlb3NpdGUuZGF0IiwiTGFzdFVwZGF0ZWQiOjAsIlVzZUNodW5rRmlsZXMiOnRydWUsIkRpcmVjdFNpdGVzIjpbImRvbWFpbjoucnUiLCJkb21haW46LnhuLS1wMWFpIiwiZ2Vvc2l0ZTpjYXRlZ29yeS1ydSJdLCJSb3V0ZU9yZGVyIjoiYmxvY2stZGlyZWN0LXByb3h5IiwiRG5zSG9zdHMiOnt9LCJHZW9pcFVybCI6Imh0dHBzOlwvXC9naXRodWIuY29tXC9Mb3lhbHNvbGRpZXJcL3YycmF5LXJ1bGVzLWRhdFwvcmVsZWFzZXNcL2xhdGVzdFwvZG93bmxvYWRcL2dlb2lwLmRhdCIsIkRvbWVzdGljRE5TRG9tYWluIjoiaHR0cHM6XC9cL2Rucy5nb29nbGVcL2Rucy1xdWVyeSIsIkZha2VEbnMiOmZhbHNlLCJSZW1vdGVETlNUeXBlIjoiRG9IIiwiTmFtZSI6IkxJQkVSVFktUk9VVElORyIsIlJlbW90ZUROU0lwIjoiMS4xLjEuMSJ9
+                        </div>
+
+                        <h3>Шаг 3. Копирование подписки</h3>
+                        <p>Вернитесь в это приложение (Bukvi) и <b>скопируйте ссылку-подписку</b> из списка выше.</p>
+
+                        <h3>Шаг 4. Добавление подписки</h3>
+                        <p>Снова зайдите в Happ, нажмите «+» в правом верхнем углу и выберите <b>«Вставить из буфера обмена»</b>.</p>
+
+                        <h3>Шаг 5. Прокси для приложений (Только Android)</h3>
+                        <p>Перейдите в <b>«Прокси для выбранных приложений»</b>, выберите "Вкл" и отметьте приложения, которые вы хотите пустить через VPN (YouTube, Telegram, Chrome и т.д.). <br><i>На iOS такой настройки нет.</i></p>
+
+                        <h3>Шаг 6. Настройка авторизации</h3>
+                        <p>Зайдите в <b>«Авторизация inbound»</b>. В обоих пунктах (SOCKS5 и HTTP) выберите Manual. В появившиеся поля (Пользователь и Пароль) введите <b>Pas2707</b>.</p>
+
+                        <h3>Шаг 7. Проверка</h3>
+                        <ul>
+                            <li>Включите VPN в Happ, нажав на большую кнопку сверху. Выберите конфиг, который у вас работает.</li>
+                            <li>Откройте <a href="https://2ip.io" target="_blank" style="color: var(--accent);">2ip.io</a>. Страна должна определяться как Германия, Нидерланды или другая зарубежная.</li>
+                            <li>Затем откройте <a href="https://2ip.ru" target="_blank" style="color: var(--accent);">2ip.ru</a>. Страна должна отображаться как Россия. Если это не так — настройка выполнена некорректно, повторите Шаг 2.</li>
+                        </ul>
+
+                        <h3>Шаг 8. Фрагментирование</h3>
+                        <p>Если все конфиги плохо работают: Нажмите на значок шестерёнки в левом верхнем углу ➔ Пролистайте меню вниз до раздела <b>Использовать фрагментирование</b> ➔ Включите тумблер.</p>
+                    </div>
+
                 </div>
 
                 <div class="card" id="tt-card" style="display: none; border: 1px solid #10b981;">
@@ -1019,8 +1039,10 @@
                     <p style="color: var(--text-secondary);">
                         <a href="#" onclick="scrollToKaring(); return false;" style="color: #8dcaff; text-decoration: underline; font-weight: 600;"> Инструкция для Karing (сверху)</a>
                     </p>
-                    <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/blob/main/FAQ/Happ.md" style="color: #8dcaff;">Текстовая инструкция для Happ (неактуальная)</a></p>
-                    <p style="color: var(--text-secondary);"><a href="https://github.com/noideastowork/vpn-api/raw/refs/heads/main/FAQ/Happ_video.mp4" style="color: #8dcaff;">Видео-инструкция для Happ (неактуальная)</a></p>
+                    <p style="color: var(--text-secondary);">
+                        <a href="#" onclick="scrollToHapp(); return false;" style="color: #8dcaff; text-decoration: underline; font-weight: 600;"> Инструкция для Happ (сверху)</a>
+                    </p>
+                    
                     <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #444;">
                         <span style="color: var(--text-secondary); font-size: 14px;">Если вы не можете связаться со мной в Telegram, напишите на эту почту:</span><br>
                         <a href="#" id="admin-email-box" style="color: var(--accent); font-weight: bold; text-decoration: none; display: inline-block; margin-top: 5px;">Загрузка...</a>
@@ -1311,23 +1333,39 @@
        // Открытие/закрытие инструкции Karing
         function toggleKaring() {
             const el = document.getElementById('karing-instruction');
+            // Если мы открываем Karing, закроем Happ для аккуратности
+            if(el.style.display !== 'block') {
+                document.getElementById('happ-instruction').style.display = 'none';
+            }
             el.style.display = (el.style.display === 'block') ? 'none' : 'block';
         }
 
-        // Плавный скролл к инструкции и её автоматическое открытие (ОБНОВЛЕННАЯ ВЕРСИЯ)
         function scrollToKaring() {
             const instructionBlock = document.getElementById('karing-instruction');
-            const karingBtn = document.getElementById('karing-btn');
-            
-            // 1. Если инструкция закрыта (display равен '' или 'none'), открываем её
             if (instructionBlock.style.display !== 'block') {
                 toggleKaring();
             }
-            
-            // 2. Плавно крутим страницу к кнопке инструкции, используя нашу новую надежную функцию
             scrollToBlock('karing-btn');
         }
-       
+
+        // Открытие/закрытие инструкции Happ
+        function toggleHapp() {
+            const el = document.getElementById('happ-instruction');
+            // Если мы открываем Happ, закроем Karing для аккуратности
+            if(el.style.display !== 'block') {
+                document.getElementById('karing-instruction').style.display = 'none';
+            }
+            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+        }
+
+        function scrollToHapp() {
+            const instructionBlock = document.getElementById('happ-instruction');
+            if (instructionBlock.style.display !== 'block') {
+                toggleHapp();
+            }
+            scrollToBlock('happ-btn');
+        }
+        
         function copyBypassList(btnElement) {
             const rawText = document.getElementById('bypass-list').textContent;
             const cleanList = rawText.split(/\s+/).filter(item => item.length > 0).join('\n');
